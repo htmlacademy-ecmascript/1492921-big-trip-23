@@ -5,7 +5,7 @@ const HtmlPlugin = require('html-webpack-plugin');
 module.exports = {
   entry: './src/main.js', // Точка входа
   output: {
-    filename: bundle.[contenthash].js, // Имя бандла
+    filename: 'bundle.[contenthash].js', // Имя бандла
     path: path.resolve(__dirname, 'build'), // Директория для файлов сборки
     clean: true, // Удаляем предыдущую сборку перед созданием новой
   },
