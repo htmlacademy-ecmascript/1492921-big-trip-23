@@ -16,21 +16,6 @@ const getDurationTimeString = (timeStart, timeEnd) => {
   return `${timeDurationHours === '00H ' ? '' : timeDurationHours}${timeDurationMinute}`;
 };
 
-const getEventShedule = (dateTimeStart, dateTimeEnd) => {
-  if (getDateISOString(dateTimeStart) !== getDateISOString(dateTimeEnd)) {
-    throw 'Начало и окончание события должно быть в один день!';
-  }
-  return {
-    dateISO: getDateISOString(dateTimeStart),
-    day: getDayString(dateTimeStart),
-    dateTimeStartISO: dateTimeStart,
-    dateTimeEndISO: dateTimeEnd,
-    timeStart: getTimeString(dateTimeStart),
-    timeEnd: getTimeString(dateTimeEnd),
-    duration: getDurationTimeString(dateTimeStart, dateTimeEnd)
-  };
-};
-
 export {getDateISOString, getDateTimeISOString, getMonthDayString, getMonthString, getDayString};
 export {getTimeString, getDateTimeString, getDurationTimeString};
 

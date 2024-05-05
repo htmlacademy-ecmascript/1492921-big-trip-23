@@ -20,7 +20,6 @@ export default class MainPresenter {
 
   // Рендеринг информации о поезке
   renderTripInfo() {
-    console.log(getTripInfo());
     render(new TripInfoView(getTripInfo()), this.tripMain, RenderPosition.AFTERBEGIN);
   }
 
