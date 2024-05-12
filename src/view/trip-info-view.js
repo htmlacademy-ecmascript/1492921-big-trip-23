@@ -25,18 +25,16 @@ export default class TripInfoView {
     };
   }
 
-  getTemplate() {
-    return tripInfoTemplate(this.tripInfo);
-  }
+  getTemplate = () => tripInfoTemplate(this.tripInfo);
 
-  getElement() {
+  getElement = () => {
     if (!this.element) {
       this.element = createElement(this.getTemplate());
     }
     return this.element;
-  }
+  };
 
-  removeElement() {
+  removeElement = () => {
     this.element = null;
-  }
+  };
 }

@@ -19,27 +19,27 @@ export default class MainPresenter {
   }
 
   // Рендеринг информации о поезке
-  renderTripInfo() {
+  renderTripInfo = () => {
     render(new TripInfoView(getTripInfo()), this.tripMain, RenderPosition.AFTERBEGIN);
-  }
+  };
 
   // Рендеринг фильтров
-  renderFiltres() {
+  renderFiltres = () => {
     render(new FiltersView(filterItems), this.tripFilters);
-  }
+  };
 
   // Рендеринг сортировки
-  renderSorting() {
+  renderSorting = () => {
     render(new SortingView(sortItems), this.tripPoints, RenderPosition.AFTERBEGIN);
-  }
+  };
 
   // Рендеринг формы редактирования данных о поездке
-  renderEditPoint (item) {
+  renderEditPoint = (item) => {
     render(new EditPointsView(item, eventTypeItems, destinationItems, offerItems), this.tripPoints);
-  }
+  };
 
   // Рендеринг событий поездки
-  renderPoints() {
+  renderPoints = () => {
     pointItems.forEach((item, index) => {
       if (index === EDIT_POINT_INDEX) {
         this.renderEditPoint(item);
@@ -47,15 +47,15 @@ export default class MainPresenter {
         render(new PointView(item), this.tripPoints);
       }
     });
-  }
+  };
 
   // Инициализация презентера
-  init() {
+  init = () => {
     this.renderTripInfo();
     this.renderFiltres();
     this.renderSorting();
     this.renderPoints();
-  }
+  };
 }
 
 

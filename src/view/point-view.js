@@ -52,18 +52,16 @@ export default class PointView {
     this.point = point;
   }
 
-  getTemplate() {
-    return pointTemplate(this.point);
-  }
+  getTemplate = () => pointTemplate(this.point);
 
-  getElement() {
+  getElement = () => {
     if (!this.element) {
       this.element = createElement(this.getTemplate());
     }
     return this.element;
-  }
+  };
 
-  removeElement() {
+  removeElement = () => {
     this.element = null;
-  }
+  };
 }

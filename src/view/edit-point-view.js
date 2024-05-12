@@ -112,18 +112,16 @@ export default class EditPointsView {
     this.offerList = offerList;
   }
 
-  getTemplate() {
-    return editPointTemplate(this.point, this.eventTypeList, this.destinationList, this.offerList);
-  }
+  getTemplate = () => editPointTemplate(this.point, this.eventTypeList, this.destinationList, this.offerList);
 
-  getElement() {
+  getElement = () => {
     if (!this.element) {
       this.element = createElement(this.getTemplate());
     }
     return this.element;
-  }
+  };
 
-  removeElement() {
+  removeElement = () => {
     this.element = null;
-  }
+  };
 }

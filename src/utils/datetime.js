@@ -1,10 +1,38 @@
-const getDateISOString = (dateTime) => new Date(dateTime).toISOString().substring(0, 10);
-const getDateTimeISOString = (dateTime) => new Date(dateTime).toISOString().substring(0, 16);
-const getMonthDayString = (dateTime) => new Date(dateTime).toLocaleDateString('en-US', {month: 'short', day: '2-digit'}).toUpperCase();
-const getMonthString = (dateTime) => new Date(dateTime).toLocaleDateString('en-US', {month: 'short'}).toUpperCase();
-const getDayString = (dateTime) => new Date(dateTime).toLocaleDateString('en-US', {day: '2-digit'});
-const getTimeString = (dateTime) => new Date(dateTime).toLocaleTimeString('en-US', {timeStyle: 'short', hourCycle: 'h24'});
-const getDateTimeString = (dateTime) => new Date(dateTime).toLocaleString('en-GB', {day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit'}).replace(', ', ' ');
+const getDateTime = (dateTime) => {
+  const dateTimeString = new Date(dateTime).toLocaleString('ru-RU');
+  const monthString = new Date(dateTime).toLocaleDateString('en-US', {month: 'short'}).toUpperCase();
+  const [date, time] = dateTimeString.split(', ');
+  const [day, month, year] = date.split('.');
+  const [hours, minutes, seconds] = time.split(':');
+  return {day, month, year, hours, minutes, seconds, monthString};
+};
+
+const getDateISOString = (dateTime) => {
+  const {day, month, year} = getDateTime(dateTime);
+  return `${year}-${month}-${day}`;
+};
+
+const getDateTimeISOString = (dateTime) => {
+  const {day, month, year, hours, minutes} = getDateTime(dateTime);
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+const getMonthString = (dateTime) => getDateTime(dateTime).monthString;
+const getDayString = (dateTime) => getDateTime(dateTime).day;
+
+const getMonthDayString = (dateTime) => {
+  const {day, monthString} = getDateTime(dateTime);
+  return `${monthString} ${day}`;
+};
+
+const getTimeString = (dateTime) => {
+  const {hours, minutes} = getDateTime(dateTime);
+  return `${hours}:${minutes}`;
+};
+const getDateTimeString = (dateTime) => {
+  const {day, month, year, hours, minutes} = getDateTime(dateTime);
+  return `${day}/${month}/${year.slice(2, 4)} ${hours}:${minutes}`;
+};
 
 const getDurationTimeString = (timeStart, timeEnd) => {
   if (getDateISOString(timeStart) !== getDateISOString(timeEnd)) {

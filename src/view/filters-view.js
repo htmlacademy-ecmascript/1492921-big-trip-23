@@ -25,18 +25,16 @@ export default class FiltersView {
     this.items = items;
   }
 
-  getTemplate() {
-    return filtersTemplate(this.items);
-  }
+  getTemplate = () => filtersTemplate(this.items);
 
-  getElement() {
+  getElement = () => {
     if (!this.element) {
       this.element = createElement(this.getTemplate());
     }
     return this.element;
-  }
+  };
 
-  removeElement() {
+  removeElement = () => {
     this.element = null;
-  }
+  };
 }
