@@ -7,3 +7,24 @@ env:
   browser: true
 
 extends: 'htmlacademy/vanilla'
+
+plugins:
+  - import
+
+rules:
+  sort-imports:
+    - error
+    - ignoreCase: true
+      ignoreDeclarationSort: true
+
+  import/order:
+    - error
+    - groups:
+        - index
+        - sibling
+        - parent
+        - internal
+        - external
+        - builtin
+        - object
+        - type
