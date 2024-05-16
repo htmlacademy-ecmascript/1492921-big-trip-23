@@ -1,7 +1,13 @@
-import {createElement} from '../render.js';
-import {getDateISOString, getDateTimeISOString, getDurationTimeString, getMonthDayString, getTimeString} from '@utils/datetime.js';
+import { createElement } from '../render.js';
+import {
+  getDateISOString,
+  getDateTimeISOString,
+  getDurationTimeString,
+  getMonthDayString,
+  getTimeString,
+} from '@utils/datetime.js';
 
-const offersItemTemplate = ({name, price}) => `
+const offersItemTemplate = ({ name, price }) => `
   <li class="event__offer">
     <span class="event__offer-title">${name}</span>
     &plus;&euro;&nbsp;
@@ -15,21 +21,30 @@ const offersTemplate = (items) => `
     ${items.map((item) => offersItemTemplate(item)).join('')}
   </ul>
 `;
-const pointTemplate = ({eventType, destination, timeStart, timeEnd, price, offers, favorite}) => `
+
+const pointTemplate = ({
+  type,
+  destination,
+  dateFrom,
+  dateTo,
+  price,
+  offers,
+  favorite,
+}) => `
   <li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="${getDateISOString(timeStart)}">${getMonthDayString(timeStart)}</time>
+      <time class="event__date" datetime="${getDateISOString(dateFrom)}">${getMonthDayString(dateFrom)}</time>
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="img/icons/${eventType.toLowerCase()}.png" alt="Event type icon">
+        <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${eventType} ${destination}</h3>
+      <h3 class="event__title">${type} ${destination}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="${getDateTimeISOString(timeStart)}">${getTimeString(timeStart)}</time>
+          <time class="event__start-time" datetime="${getDateTimeISOString(dateFrom)}">${getTimeString(dateFrom)}</time>
           &mdash;
-          <time class="event__end-time" datetime="${getDateTimeISOString(timeEnd)}">${getTimeString(timeEnd)}</time>
+          <time class="event__end-time" datetime="${getDateTimeISOString(dateTo)}">${getTimeString(dateTo)}</time>
         </p>
-        <p class="event__duration">${getDurationTimeString(timeStart, timeEnd)}</p>
+        <p class="event__duration">${getDurationTimeString(dateFrom, dateTo)}</p>
       </div>
       <p class="event__price">
         &euro;&nbsp;<span class="event__price-value">${price}</span>

@@ -6,7 +6,9 @@ env:
   es2022: true
   browser: true
 
-extends: 'htmlacademy/vanilla'
+extends:
+  - 'htmlacademy/vanilla'
+  - 'prettier'
 
 plugins:
   - import

@@ -1,13 +1,25 @@
-import {render, RenderPosition} from '../render.js';
-import {destinationItems, eventTypeItems, filterItems, offerItems, pointItems, sortItems} from '@model/data-model.js';
-import {getTripInfo} from '@model/data-model.js';
+import { render, RenderPosition } from '../render.js';
+import {
+  DestinationListModel,
+  EventTypeListModel,
+  OfferListModel,
+  PointListModel,
+  PointViewModel,
+} from '@model/data-model.js';
+import { filterItems, sortItems } from '@model/data-model.js';
 import TripInfoView from '@view/trip-info-view.js';
 import SortingView from '@view/sorting-view.js';
 import PointView from '@view/point-view.js';
 import EditPointsView from '@view/edit-point-view.js';
 import FiltersView from '@view/filters-view.js';
 
+const destinationListModel = new DestinationListModel();
+const eventTypeListModel = new EventTypeListModel();
+const offerListModel = new OfferListModel();
+const pointListModel = new PointListModel();
+
 const EDIT_POINT_INDEX = 1;
+const NEW_POINT_INDEX = 2;
 
 export default class MainPresenter {
   constructor() {
@@ -20,7 +32,11 @@ export default class MainPresenter {
 
   // Рендеринг информации о поезке
   renderTripInfo = () => {
-    render(new TripInfoView(getTripInfo()), this.tripMain, RenderPosition.AFTERBEGIN);
+    render(
+      new TripInfoView(pointListModel.getTripInfo()),
+      this.tripMain,
+      RenderPosition.AFTERBEGIN,
+    );
   };
 
   // Рендеринг фильтров
@@ -30,21 +46,39 @@ export default class MainPresenter {
 
   // Рендеринг сортировки
   renderSorting = () => {
-    render(new SortingView(sortItems), this.tripPoints, RenderPosition.AFTERBEGIN);
+    render(
+      new SortingView(sortItems),
+      this.tripPoints,
+      RenderPosition.AFTERBEGIN,
+    );
   };
 
   // Рендеринг формы редактирования данных о поездке
-  renderEditPoint = (item) => {
-    render(new EditPointsView(item, eventTypeItems, destinationItems, offerItems), this.tripPoints);
+  renderEditPoint = (item, isNew) => {
+    render(
+      new EditPointsView(
+        item,
+        eventTypeListModel.getEventTypeList(),
+        destinationListModel.getDestinationList(),
+        offerListModel.getOfferList(item.type),
+        isNew,
+      ),
+      this.tripPoints,
+    );
   };
 
   // Рендеринг событий поездки
   renderPoints = () => {
-    pointItems.forEach((item, index) => {
+    pointListModel.getPointList().forEach((item, index) => {
       if (index === EDIT_POINT_INDEX) {
-        this.renderEditPoint(item);
+        this.renderEditPoint(item, false);
+      } else if (index === NEW_POINT_INDEX) {
+        this.renderEditPoint(item, true);
       } else {
-        render(new PointView(item), this.tripPoints);
+        render(
+          new PointView(new PointViewModel(item).getPointView()),
+          this.tripPoints,
+        );
       }
     });
   };
@@ -57,5 +91,3 @@ export default class MainPresenter {
     this.renderPoints();
   };
 }
-
-

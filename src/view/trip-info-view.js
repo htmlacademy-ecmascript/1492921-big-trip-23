@@ -1,7 +1,7 @@
-import {createElement} from '../render.js';
-import {getDayString, getMonthString} from '@utils/datetime.js';
+import { createElement } from '../render.js';
+import { getDayString, getMonthString } from '@utils/datetime.js';
 
-const tripInfoTemplate = ({trip, period, cost}) => `
+const tripInfoTemplate = ({ trip, period, cost }) => `
   <section class="trip-main__trip-info  trip-info">
     <div class="trip-info__main">
       <h1 class="trip-info__title">${trip}</h1>
@@ -13,15 +13,18 @@ const tripInfoTemplate = ({trip, period, cost}) => `
   </section>`;
 
 export default class TripInfoView {
-  constructor({points, dateTimeStart, dateTimeEnd, cost}) {
-    const startMonth = getMonthString(dateTimeStart);
-    const startDay = getDayString(dateTimeStart);
-    const endMonth = getMonthString(dateTimeEnd);
-    const endDay = getDayString(dateTimeEnd);
+  constructor({ points, dateFrom, dateTo, cost }) {
+    const startMonth = getMonthString(dateFrom);
+    const startDay = getDayString(dateFrom);
+    const endMonth = getMonthString(dateTo);
+    const endDay = getDayString(dateTo);
     this.tripInfo = {
-      trip: points.join(' &mdash; '),
+      trip:
+        points.length > 3
+          ? `${points[0]}&mdash;...&mdash;${points[points.length - 1]}`
+          : points.join('&mdash;'),
       period: `${startDay}${startMonth === endMonth ? '' : `&nbsp;${startMonth}`}&nbsp;&mdash;&nbsp;${endDay}&nbsp;${endMonth}`,
-      cost: cost
+      cost: cost,
     };
   }
 
