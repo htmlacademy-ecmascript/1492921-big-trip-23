@@ -2,6 +2,15 @@ import { createElement } from '@src/render.js';
 import { getDateTimeString } from '@utils/datetime.js';
 import { Folders } from '@src/const.js';
 
+const BLANK_POINT = {
+  type: 'Flight',
+  destination: 'Paris',
+  dateFrom: new Date().toISOString(),
+  dateTo: new Date().toISOString(),
+  price: 0,
+  offers: [],
+};
+
 const eventTypeItemTemplate = (name) => {
   const nameLower = name.toLowerCase();
   return `<div class="event__type-item">
@@ -50,7 +59,7 @@ const descriptionTemplate = (destination, destinationList, isNew) => {
   );
 
   let picturesTemplate = '';
-  if (destinationItem.description) {
+  if (destinationItem && destinationItem.description) {
     if (isNew) {
       picturesTemplate = `
         <div class="event__photos-container">
@@ -133,12 +142,12 @@ const editPointTemplate = (
 `;
 
 export default class EditPointsView {
-  constructor(point, eventTypeList, destinationList, offerList, isNew) {
+  constructor(point = BLANK_POINT, eventTypeList, destinationList, offerList) {
     this.point = point;
     this.eventTypeList = eventTypeList;
     this.destinationList = destinationList;
     this.offerList = offerList;
-    this.isNew = isNew;
+    this.isNew = point === BLANK_POINT;
   }
 
   getTemplate() {

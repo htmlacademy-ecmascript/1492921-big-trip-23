@@ -19,7 +19,6 @@ const offerListModel = new OfferListModel();
 const pointListModel = new PointListModel();
 
 const EDIT_POINT_INDEX = 1;
-const NEW_POINT_INDEX = 2;
 
 export default class MainPresenter {
   constructor() {
@@ -54,14 +53,13 @@ export default class MainPresenter {
   }
 
   // Рендеринг формы редактирования данных о поездке
-  renderEditPoint(item, isNew) {
+  renderEditPoint(item) {
     render(
       new EditPointsView(
         item,
         eventTypeListModel.getEventTypeList(),
         destinationListModel.getDestinationList(),
-        offerListModel.getOfferList(item.type),
-        isNew,
+        offerListModel.getOfferList(item ? item.type : 'Flight'),
       ),
       this.tripPoints,
     );
@@ -69,11 +67,10 @@ export default class MainPresenter {
 
   // Рендеринг событий поездки
   renderPoints() {
+    this.renderEditPoint();
     pointListModel.getPointList().forEach((item, index) => {
       if (index === EDIT_POINT_INDEX) {
-        this.renderEditPoint(item, false);
-      } else if (index === NEW_POINT_INDEX) {
-        this.renderEditPoint(item, true);
+        this.renderEditPoint(item);
       } else {
         render(
           new PointView(new PointViewModel(item).getPointView()),
