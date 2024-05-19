@@ -18,13 +18,15 @@ export default class TripInfoView {
     const startDay = getDayString(dateFrom);
     const endMonth = getMonthString(dateTo);
     const endDay = getDayString(dateTo);
+    const trip =
+      points.length > 3
+        ? `${points[0]}&mdash;...&mdash;${points[points.length - 1]}`
+        : points.join('&mdash;');
+    const period = `${startDay}${startMonth === endMonth ? '' : `&nbsp;${startMonth}`}&nbsp;&mdash;&nbsp;${endDay}&nbsp;${endMonth}`;
     this.tripInfo = {
-      trip:
-        points.length > 3
-          ? `${points[0]}&mdash;...&mdash;${points[points.length - 1]}`
-          : points.join('&mdash;'),
-      period: `${startDay}${startMonth === endMonth ? '' : `&nbsp;${startMonth}`}&nbsp;&mdash;&nbsp;${endDay}&nbsp;${endMonth}`,
-      cost: cost,
+      trip,
+      period,
+      cost,
     };
   }
 

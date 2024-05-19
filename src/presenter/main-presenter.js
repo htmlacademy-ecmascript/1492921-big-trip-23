@@ -6,7 +6,7 @@ import {
   PointListModel,
   PointViewModel,
 } from '@model/data-model.js';
-import { filterItems, sortItems } from '@model/data-model.js';
+import { FilterItems, SortItems } from '@model/data-model.js';
 import TripInfoView from '@view/trip-info-view.js';
 import SortingView from '@view/sorting-view.js';
 import PointView from '@view/point-view.js';
@@ -41,13 +41,13 @@ export default class MainPresenter {
 
   // Рендеринг фильтров
   renderFiltres = () => {
-    render(new FiltersView(filterItems), this.tripFilters);
+    render(new FiltersView(FilterItems), this.tripFilters);
   };
 
   // Рендеринг сортировки
   renderSorting = () => {
     render(
-      new SortingView(sortItems),
+      new SortingView(SortItems),
       this.tripPoints,
       RenderPosition.AFTERBEGIN,
     );

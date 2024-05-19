@@ -186,11 +186,10 @@ const pointItems = [
   },
 ];
 
-const getRandomPoints = () =>
-  getRandomArrayElements(
-    pointItems,
-    getRandomInt(MIN_COUNT_POINTS, pointItems.length),
-  ).sort((a, b) => {
+const randomInt = getRandomInt(MIN_COUNT_POINTS, pointItems.length);
+
+const randomPoints = getRandomArrayElements(pointItems, randomInt).sort(
+  (a, b) => {
     if (a.dateFrom < b.dateFrom) {
       return -1;
     }
@@ -198,7 +197,8 @@ const getRandomPoints = () =>
       return 1;
     }
     return 0;
-  });
+  },
+);
 
 export {
   pointItems,
@@ -206,5 +206,5 @@ export {
   destinationItems,
   offerItems,
   eventTypeOffers,
-  getRandomPoints,
+  randomPoints,
 };
