@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import { createElement } from '@src/render.js';
 
 const filterItemTemplate = (name) => {
   const nameLower = name.toLowerCase();
@@ -27,16 +27,18 @@ export default class FiltersView {
     this.items = items;
   }
 
-  getTemplate = () => filtersTemplate(this.items);
+  getTemplate() {
+    return filtersTemplate(this.items);
+  }
 
-  getElement = () => {
+  getElement() {
     if (!this.element) {
       this.element = createElement(this.getTemplate());
     }
     return this.element;
-  };
+  }
 
-  removeElement = () => {
+  removeElement() {
     this.element = null;
-  };
+  }
 }

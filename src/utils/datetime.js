@@ -1,54 +1,50 @@
-const getDateTime = (dateTime) => {
-  const dateTimeString = new Date(dateTime).toLocaleString('ru-RU');
-  const monthString = new Date(dateTime)
-    .toLocaleDateString('en-US', { month: 'short' })
-    .toUpperCase();
-  const [date, time] = dateTimeString.split(', ');
-  const [day, month, year] = date.split('.');
-  const [hours, minutes, seconds] = time.split(':');
-  return { day, month, year, hours, minutes, seconds, monthString };
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
+
+const DateTimeFormats = {
+  DATE_TIME_ISO: 'YYYY-MM-DDTHH:mm',
+  DATE_TIME: 'DD/MM/YY HH:mm',
+  DATE_ISO: 'YYYY-MM-DD',
+  DAY_MONTH: 'DD MMM',
+  MONTH_DAY: 'MMM DD',
+  TIME: 'HH:mm',
 };
 
-const getDateISOString = (dateTime) => {
-  const { day, month, year } = getDateTime(dateTime);
-  return `${year}-${month}-${day}`;
-};
+const getDateISOString = (dateTime) =>
+  dayjs(dateTime).format(DateTimeFormats.DATE_ISO);
 
-const getDateTimeISOString = (dateTime) => {
-  const { day, month, year, hours, minutes } = getDateTime(dateTime);
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-};
+const getDateTimeISOString = (dateTime) =>
+  dayjs(dateTime).format(DateTimeFormats.DATE_TIME_ISO);
 
-const getMonthString = (dateTime) => getDateTime(dateTime).monthString;
-const getDayString = (dateTime) => getDateTime(dateTime).day;
+const getMonthDayString = (dateTime) =>
+  dayjs(dateTime).format(DateTimeFormats.MONTH_DAY);
 
-const getMonthDayString = (dateTime) => {
-  const { day, monthString } = getDateTime(dateTime);
-  return `${monthString} ${day}`;
-};
+const getDayMonthString = (dateTime) =>
+  dayjs(dateTime).format(DateTimeFormats.DAY_MONTH);
 
-const getTimeString = (dateTime) => {
-  const { hours, minutes } = getDateTime(dateTime);
-  return `${hours}:${minutes}`;
-};
-const getDateTimeString = (dateTime) => {
-  const { day, month, year, hours, minutes } = getDateTime(dateTime);
-  return `${day}/${month}/${year.slice(2, 4)} ${hours}:${minutes}`;
-};
+const getTimeString = (dateTime) =>
+  dayjs(dateTime).format(DateTimeFormats.TIME);
 
-const getDurationTimeString = (timeStart, timeEnd) => {
-  const timeDucation = new Date(new Date(timeEnd) - new Date(timeStart));
-  const timeDurationDays = `${timeDucation.toISOString().substring(8, 10)}D `;
-  const timeDurationHours = `${timeDucation.toISOString().substring(11, 13)}H `;
-  const timeDurationMinute = `${timeDucation.toISOString().substring(14, 16)}M`;
-  return `${timeDurationDays === '01D ' ? '' : timeDurationDays}${timeDurationHours === '00H ' ? '' : timeDurationHours}${timeDurationMinute}`;
+const getDateTimeString = (dateTime) =>
+  dayjs(dateTime).format(DateTimeFormats.DATE_TIME);
+
+const getDurationTimeString = (dateFrom, dateTo) => {
+  const diffDates = dayjs.duration(dayjs(dateTo).diff(dayjs(dateFrom)));
+  const days = Math.floor(diffDates.asDays());
+  const hours = Math.floor(diffDates.asHours());
+  const hoursTemplate = hours >= 1 ? 'HH[H] ' : '';
+  return diffDates.format(
+    `${days >= 1 ? `[${days}D] HH[H] ` : hoursTemplate}mm[M]`,
+  );
 };
 
 export {
   getDateISOString,
   getDateTimeISOString,
   getMonthDayString,
-  getMonthString,
-  getDayString,
+  getDayMonthString,
+  getTimeString,
+  getDateTimeString,
+  getDurationTimeString,
 };
-export { getTimeString, getDateTimeString, getDurationTimeString };

@@ -1,4 +1,5 @@
-import { createElement } from '../render.js';
+import { Folders } from '@src/const.js';
+import { createElement } from '@src/render.js';
 import {
   getDateISOString,
   getDateTimeISOString,
@@ -33,17 +34,17 @@ const pointTemplate = ({
 }) => `
   <li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="${getDateISOString(dateFrom)}">${getMonthDayString(dateFrom)}</time>
+    <time class="event__date" datetime="${getDateISOString(dateFrom)}">${getMonthDayString(dateFrom)}</time>
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
+        <img class="event__type-icon" width="42" height="42" src="${Folders.ICON}${type.toLowerCase()}.png" alt="Event type icon">
       </div>
       <h3 class="event__title">${type} ${destination}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="${getDateTimeISOString(dateFrom)}">${getTimeString(dateFrom)}</time>
-          &mdash;
-          <time class="event__end-time" datetime="${getDateTimeISOString(dateTo)}">${getTimeString(dateTo)}</time>
-        </p>
+        <time class="event__start-time" datetime="${getDateTimeISOString(dateFrom)}">${getTimeString(dateFrom)}</time>
+        &mdash;
+        <time class="event__end-time" datetime="${getDateTimeISOString(dateTo)}">${getTimeString(dateTo)}</time>
+       </p>
         <p class="event__duration">${getDurationTimeString(dateFrom, dateTo)}</p>
       </div>
       <p class="event__price">
@@ -67,16 +68,18 @@ export default class PointView {
     this.point = point;
   }
 
-  getTemplate = () => pointTemplate(this.point);
+  getTemplate() {
+    return pointTemplate(this.point);
+  }
 
-  getElement = () => {
+  getElement() {
     if (!this.element) {
       this.element = createElement(this.getTemplate());
     }
     return this.element;
-  };
+  }
 
-  removeElement = () => {
+  removeElement() {
     this.element = null;
-  };
+  }
 }

@@ -1,4 +1,4 @@
-import { render, RenderPosition } from '../render.js';
+import { render, RenderPosition } from '@src/render.js';
 import {
   DestinationListModel,
   EventTypeListModel,
@@ -31,30 +31,30 @@ export default class MainPresenter {
   }
 
   // Рендеринг информации о поезке
-  renderTripInfo = () => {
+  renderTripInfo() {
     render(
       new TripInfoView(pointListModel.getTripInfo()),
       this.tripMain,
       RenderPosition.AFTERBEGIN,
     );
-  };
+  }
 
   // Рендеринг фильтров
-  renderFiltres = () => {
+  renderFiltres() {
     render(new FiltersView(FilterItems), this.tripFilters);
-  };
+  }
 
   // Рендеринг сортировки
-  renderSorting = () => {
+  renderSorting() {
     render(
       new SortingView(SortItems),
       this.tripPoints,
       RenderPosition.AFTERBEGIN,
     );
-  };
+  }
 
   // Рендеринг формы редактирования данных о поездке
-  renderEditPoint = (item, isNew) => {
+  renderEditPoint(item, isNew) {
     render(
       new EditPointsView(
         item,
@@ -65,10 +65,10 @@ export default class MainPresenter {
       ),
       this.tripPoints,
     );
-  };
+  }
 
   // Рендеринг событий поездки
-  renderPoints = () => {
+  renderPoints() {
     pointListModel.getPointList().forEach((item, index) => {
       if (index === EDIT_POINT_INDEX) {
         this.renderEditPoint(item, false);
@@ -81,13 +81,13 @@ export default class MainPresenter {
         );
       }
     });
-  };
+  }
 
   // Инициализация презентера
-  init = () => {
+  init() {
     this.renderTripInfo();
     this.renderFiltres();
     this.renderSorting();
     this.renderPoints();
-  };
+  }
 }

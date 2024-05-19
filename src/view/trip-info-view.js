@@ -1,5 +1,5 @@
-import { createElement } from '../render.js';
-import { getDayString, getMonthString } from '@utils/datetime.js';
+import { createElement } from '@src/render.js';
+import { getDayMonthString } from '@utils/datetime.js';
 
 const tripInfoTemplate = ({ trip, period, cost }) => `
   <section class="trip-main__trip-info  trip-info">
@@ -14,15 +14,13 @@ const tripInfoTemplate = ({ trip, period, cost }) => `
 
 export default class TripInfoView {
   constructor({ points, dateFrom, dateTo, cost }) {
-    const startMonth = getMonthString(dateFrom);
-    const startDay = getDayString(dateFrom);
-    const endMonth = getMonthString(dateTo);
-    const endDay = getDayString(dateTo);
+    const [startDay, startMonth] = getDayMonthString(dateFrom).split(' ');
+    const [endDay, endMonth] = getDayMonthString(dateTo).split(' ');
     const trip =
       points.length > 3
-        ? `${points[0]}&mdash;...&mdash;${points[points.length - 1]}`
-        : points.join('&mdash;');
-    const period = `${startDay}${startMonth === endMonth ? '' : `&nbsp;${startMonth}`}&nbsp;&mdash;&nbsp;${endDay}&nbsp;${endMonth}`;
+        ? `${points[0]} &mdash; ... &mdash; ${points[points.length - 1]}`
+        : points.join(' &mdash; ');
+    const period = `${startDay}${startMonth === endMonth ? '' : ` ${startMonth}`} &mdash; ${endDay} ${endMonth}`;
     this.tripInfo = {
       trip,
       period,
@@ -30,16 +28,18 @@ export default class TripInfoView {
     };
   }
 
-  getTemplate = () => tripInfoTemplate(this.tripInfo);
+  getTemplate() {
+    return tripInfoTemplate(this.tripInfo);
+  }
 
-  getElement = () => {
+  getElement() {
     if (!this.element) {
       this.element = createElement(this.getTemplate());
     }
     return this.element;
-  };
+  }
 
-  removeElement = () => {
+  removeElement() {
     this.element = null;
-  };
+  }
 }

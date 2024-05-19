@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import { createElement } from '@src/render.js';
 
 const sortItemTemplate = (name) => {
   const nameLower = name.toLowerCase();
@@ -23,16 +23,18 @@ export default class SortingView {
     this.items = items;
   }
 
-  getTemplate = () => sortingTemplate(this.items);
+  getTemplate() {
+    return sortingTemplate(this.items);
+  }
 
-  getElement = () => {
+  getElement() {
     if (!this.element) {
       this.element = createElement(this.getTemplate());
     }
     return this.element;
-  };
+  }
 
-  removeElement = () => {
+  removeElement() {
     this.element = null;
-  };
+  }
 }

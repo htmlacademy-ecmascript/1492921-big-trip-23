@@ -1,5 +1,6 @@
-import { createElement } from '../render.js';
+import { createElement } from '@src/render.js';
 import { getDateTimeString } from '@utils/datetime.js';
+import { Folders } from '@src/const.js';
 
 const eventTypeItemTemplate = (name) => {
   const nameLower = name.toLowerCase();
@@ -84,7 +85,7 @@ const editPointTemplate = (
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="${Folders.ICON}${type.toLowerCase()}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
           ${eventTypeListTemplate(eventTypeList)}
@@ -140,23 +141,24 @@ export default class EditPointsView {
     this.isNew = isNew;
   }
 
-  getTemplate = () =>
-    editPointTemplate(
+  getTemplate() {
+    return editPointTemplate(
       this.point,
       this.eventTypeList,
       this.destinationList,
       this.offerList,
       this.isNew,
     );
+  }
 
-  getElement = () => {
+  getElement() {
     if (!this.element) {
       this.element = createElement(this.getTemplate());
     }
     return this.element;
-  };
+  }
 
-  removeElement = () => {
+  removeElement() {
     this.element = null;
-  };
+  }
 }

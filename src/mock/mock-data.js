@@ -179,7 +179,7 @@ const pointItems = [
     type: 'Check-in',
     destination: 'Paris',
     dateFrom: '2019-03-22T15:40',
-    dateTo: '2019-03-23T12:00',
+    dateTo: '2019-04-23T12:00',
     price: 500,
     offers: getRandomOffers('Bus'),
     isFavorite: true,

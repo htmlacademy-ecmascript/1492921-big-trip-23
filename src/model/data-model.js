@@ -25,14 +25,18 @@ export class EventTypeListModel {
     this.eventTypeList = eventTypeItems;
   }
 
-  getEventTypeList = () => this.eventTypeList;
+  getEventTypeList() {
+    return this.eventTypeList;
+  }
 }
 export class DestinationListModel {
   constructor() {
     this.destinationList = destinationItems;
   }
 
-  getDestinationList = () => this.destinationList;
+  getDestinationList() {
+    return this.destinationList;
+  }
 }
 export class OfferListModel {
   constructor() {
@@ -40,7 +44,7 @@ export class OfferListModel {
     this.offerListEventType = eventTypeOffers;
   }
 
-  getOfferList = (eventType) => {
+  getOfferList(eventType) {
     const offerEventType = this.offerListEventType.find(
       (offer) => offer.type === eventType,
     );
@@ -49,7 +53,7 @@ export class OfferListModel {
         offerEventType.offers.includes(item.id),
       );
     }
-  };
+  }
 }
 
 export class PointViewModel {
@@ -58,35 +62,44 @@ export class PointViewModel {
     this.offerList = offerItems;
   }
 
-  getOffers = () =>
-    this.offerList.filter((item) => this.pointView.offers.includes(item.id));
+  getOffers() {
+    return this.offerList.filter((item) =>
+      this.pointView.offers.includes(item.id),
+    );
+  }
 
-  getPointView = () => {
+  getPointView() {
     this.pointView.offers = this.getOffers();
     return this.pointView;
-  };
+  }
 }
 export class PointListModel {
   constructor() {
     this.pointList = randomPoints;
   }
 
-  getPointList = () => this.pointList;
+  getPointList() {
+    return this.pointList;
+  }
 
-  getTripInfo = () => ({
-    points: Array.from(new Set(this.pointList.map((item) => item.destination))),
-    dateFrom: this.pointList[0].dateFrom,
-    dateTo: this.pointList[this.pointList.length - 1].dateTo,
-    cost: this.pointList.reduce(
-      (cost, item) =>
-        cost +
-        item.price +
-        new PointViewModel(item)
-          .getOffers()
-          .reduce((sum, offer) => sum + offer.price, 0),
-      0,
-    ),
-  });
+  getTripInfo() {
+    return {
+      points: Array.from(
+        new Set(this.pointList.map((item) => item.destination)),
+      ),
+      dateFrom: this.pointList[0].dateFrom,
+      dateTo: this.pointList[this.pointList.length - 1].dateTo,
+      cost: this.pointList.reduce(
+        (cost, item) =>
+          cost +
+          item.price +
+          new PointViewModel(item)
+            .getOffers()
+            .reduce((sum, offer) => sum + offer.price, 0),
+        0,
+      ),
+    };
+  }
 }
 
 export { FilterItems, SortItems };
