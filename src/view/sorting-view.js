@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import { createElement } from '@src/render.js';
 
 const sortItemTemplate = (name) => {
   const nameLower = name.toLowerCase();
@@ -12,7 +12,9 @@ const sortItemTemplate = (name) => {
 
 const sortingTemplate = (items) => `
   <form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-    ${items.map((item) => sortItemTemplate(item)).join('')}
+    ${Object.values(items)
+      .map((item) => sortItemTemplate(item))
+      .join('')}
   </form>
 `;
 
@@ -21,16 +23,18 @@ export default class SortingView {
     this.items = items;
   }
 
-  getTemplate = () => sortingTemplate(this.items);
+  getTemplate() {
+    return sortingTemplate(this.items);
+  }
 
-  getElement = () => {
+  getElement() {
     if (!this.element) {
       this.element = createElement(this.getTemplate());
     }
     return this.element;
-  };
+  }
 
-  removeElement = () => {
+  removeElement() {
     this.element = null;
-  };
+  }
 }

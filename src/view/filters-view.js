@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import { createElement } from '@src/render.js';
 
 const filterItemTemplate = (name) => {
   const nameLower = name.toLowerCase();
@@ -14,7 +14,9 @@ const filtersTemplate = (items) => `
   <div class="trip-controls__filters">
     <h2 class="visually-hidden">Filter events</h2>
     <form class="trip-filters" action="#" method="get">
-      ${items.map((item) => filterItemTemplate(item)).join('')}
+      ${Object.values(items)
+        .map((item) => filterItemTemplate(item))
+        .join('')}
       <button class="visually-hidden" type="submit">Accept filter</button>
     </form>
   </div>
@@ -25,16 +27,18 @@ export default class FiltersView {
     this.items = items;
   }
 
-  getTemplate = () => filtersTemplate(this.items);
+  getTemplate() {
+    return filtersTemplate(this.items);
+  }
 
-  getElement = () => {
+  getElement() {
     if (!this.element) {
       this.element = createElement(this.getTemplate());
     }
     return this.element;
-  };
+  }
 
-  removeElement = () => {
+  removeElement() {
     this.element = null;
-  };
+  }
 }

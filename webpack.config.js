@@ -12,13 +12,15 @@ module.exports = {
   devtool: 'source-map', // Генерируем карту исходного кода
   resolve: {
     alias: {
-      "@view": path.resolve(__dirname, 'src/view/'),
-      "@utils": path.resolve(__dirname, 'src/utils/'),
-      "@presenter": path.resolve(__dirname, 'src/presenter/'),
-      "@model": path.resolve(__dirname, 'src/model/')
+      '@src': path.resolve(__dirname, 'src/'),
+      '@view': path.resolve(__dirname, 'src/view/'),
+      '@utils': path.resolve(__dirname, 'src/utils/'),
+      '@presenter': path.resolve(__dirname, 'src/presenter/'),
+      '@model': path.resolve(__dirname, 'src/model/'),
     },
   },
-  plugins: [ // Подключаем плагины
+  plugins: [
+    // Подключаем плагины
     new HtmlPlugin({
       template: 'public/index.html',
     }),
@@ -34,14 +36,15 @@ module.exports = {
     }),
   ],
   module: {
-    rules: [ // Добавляем лоадеры
+    rules: [
+      // Добавляем лоадеры
       {
         test: /\.js$/,
         exclude: /(node_modules)/,
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env']
+            presets: ['@babel/preset-env'],
           },
         },
       },

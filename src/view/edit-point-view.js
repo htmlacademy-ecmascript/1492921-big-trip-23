@@ -1,5 +1,15 @@
-import {createElement} from '../render.js';
-import {getDateTimeString} from '@utils/datetime.js';
+import { createElement } from '@src/render.js';
+import { getDateTimeString } from '@utils/datetime.js';
+import { Folders } from '@src/const.js';
+
+const BLANK_POINT = {
+  type: 'Flight',
+  destination: 'Paris',
+  dateFrom: new Date().toISOString(),
+  dateTo: new Date().toISOString(),
+  price: 0,
+  offers: [],
+};
 
 const eventTypeItemTemplate = (name) => {
   const nameLower = name.toLowerCase();
@@ -18,7 +28,7 @@ const eventTypeListTemplate = (items) => `
   </div>
 `;
 
-const offersItemTemplate = ({code, name, price}, checked) => `
+const offersItemTemplate = ({ code, name, price }, checked) => `
   <div class="event__offer-selector">
     <input class="event__offer-checkbox  visually-hidden" id="event-offer-${code}-1" type="checkbox" name="event-offer-${code}" ${checked ? 'checked' : ''}>
     <label class="event__offer-label" for="event-offer-${code}-1">
@@ -29,35 +39,62 @@ const offersItemTemplate = ({code, name, price}, checked) => `
   </div>
 `;
 
-const offersTemplate = (items, itemsChecked) => `
+const offersTemplate = (items, itemsChecked) =>
+  `${
+    items
+      ? `
   <section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${items.map((item) => offersItemTemplate(item, itemsChecked.find((element) => element.name === item.name) !== undefined)).join('')}
+      ${items.map((item) => offersItemTemplate(item, itemsChecked.find((element) => element === item.id) !== undefined)).join('')}
     </div>
   </section>
-`;
+`
+      : ''
+  }`;
 
-const descriptionTemplate = (destination, destinationList) => {
-  const description = destinationList.find((element) => element.name === destination).description;
-  if (description) {
+const descriptionTemplate = (destination, destinationList, isNew) => {
+  const destinationItem = destinationList.find(
+    (element) => element.id === destination,
+  );
+
+  let picturesTemplate = '';
+  if (destinationItem && destinationItem.description) {
+    if (isNew) {
+      picturesTemplate = `
+        <div class="event__photos-container">
+          <div class="event__photos-tape">
+            ${destinationItem.pictures.map(
+              (picture) =>
+                `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`,
+            )}
+          </div>
+        </div>`;
+    }
     return `
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">${description}</p>
+        <p class="event__destination-description">${destinationItem.description}</p>
+        ${picturesTemplate}
       </section>`;
   }
   return '';
 };
 
-const editPointTemplate = ({eventType, destination, timeStart, timeEnd, price, offers}, eventTypeList, destinationList, offersList) => `
+const editPointTemplate = (
+  { type, destination, dateFrom, dateTo, price, offers },
+  eventTypeList,
+  destinationList,
+  offersList,
+  isNew,
+) => `
   <li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/${eventType.toLowerCase()}.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="${Folders.ICON}${type.toLowerCase()}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
           ${eventTypeListTemplate(eventTypeList)}
@@ -65,7 +102,7 @@ const editPointTemplate = ({eventType, destination, timeStart, timeEnd, price, o
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-            ${eventType}
+            ${type}
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
           <datalist id="destination-list-1">
@@ -75,10 +112,10 @@ const editPointTemplate = ({eventType, destination, timeStart, timeEnd, price, o
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getDateTimeString(timeStart)}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getDateTimeString(dateFrom)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-start-time" value="${getDateTimeString(timeEnd)}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-start-time" value="${getDateTimeString(dateTo)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -98,30 +135,39 @@ const editPointTemplate = ({eventType, destination, timeStart, timeEnd, price, o
 
       <section class="event__details">
         ${offersTemplate(offersList, offers)}
-        ${descriptionTemplate(destination, destinationList)}
+        ${descriptionTemplate(destination, destinationList, isNew)}
       </section>
     </form>
   </li>
 `;
 
 export default class EditPointsView {
-  constructor(point, eventTypeList, destinationList, offerList) {
+  constructor(point = BLANK_POINT, eventTypeList, destinationList, offerList) {
     this.point = point;
     this.eventTypeList = eventTypeList;
     this.destinationList = destinationList;
     this.offerList = offerList;
+    this.isNew = point === BLANK_POINT;
   }
 
-  getTemplate = () => editPointTemplate(this.point, this.eventTypeList, this.destinationList, this.offerList);
+  getTemplate() {
+    return editPointTemplate(
+      this.point,
+      this.eventTypeList,
+      this.destinationList,
+      this.offerList,
+      this.isNew,
+    );
+  }
 
-  getElement = () => {
+  getElement() {
     if (!this.element) {
       this.element = createElement(this.getTemplate());
     }
     return this.element;
-  };
+  }
 
-  removeElement = () => {
+  removeElement() {
     this.element = null;
-  };
+  }
 }
