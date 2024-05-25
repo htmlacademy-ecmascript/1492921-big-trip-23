@@ -1,5 +1,5 @@
 import { Folders } from '@src/const.js';
-import { createElement } from '@src/render.js';
+import AbstractView from '@framework/view/abstract-view.js';
 import {
   getDateISOString,
   getDateTimeISOString,
@@ -63,23 +63,13 @@ const pointTemplate = ({
     </div>
   </li>`;
 
-export default class PointView {
+export default class PointView extends AbstractView {
   constructor(point) {
+    super();
     this.point = point;
   }
 
-  getTemplate() {
+  get template() {
     return pointTemplate(this.point);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

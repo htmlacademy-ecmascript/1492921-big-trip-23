@@ -1,4 +1,4 @@
-import { createElement } from '@src/render.js';
+import AbstractView from '@framework/view/abstract-view.js';
 import { getDateTimeString } from '@utils/datetime.js';
 import { Folders } from '@src/const.js';
 
@@ -141,8 +141,9 @@ const editPointTemplate = (
   </li>
 `;
 
-export default class EditPointsView {
+export default class EditPointsView extends AbstractView {
   constructor(point = BLANK_POINT, eventTypeList, destinationList, offerList) {
+    super();
     this.point = point;
     this.eventTypeList = eventTypeList;
     this.destinationList = destinationList;
@@ -150,7 +151,7 @@ export default class EditPointsView {
     this.isNew = point === BLANK_POINT;
   }
 
-  getTemplate() {
+  get template() {
     return editPointTemplate(
       this.point,
       this.eventTypeList,
@@ -158,16 +159,5 @@ export default class EditPointsView {
       this.offerList,
       this.isNew,
     );
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

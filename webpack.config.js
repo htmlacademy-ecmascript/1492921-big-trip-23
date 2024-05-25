@@ -17,6 +17,7 @@ module.exports = {
       '@utils': path.resolve(__dirname, 'src/utils/'),
       '@presenter': path.resolve(__dirname, 'src/presenter/'),
       '@model': path.resolve(__dirname, 'src/model/'),
+      '@framework': path.resolve(__dirname, 'src/framework/'),
     },
   },
   plugins: [
@@ -47,6 +48,10 @@ module.exports = {
             presets: ['@babel/preset-env'],
           },
         },
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
       },
     ],
   },

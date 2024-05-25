@@ -1,5 +1,5 @@
-import { createElement } from '@src/render.js';
 import { getDayMonthString } from '@utils/datetime.js';
+import AbstractView from '@framework/view/abstract-view.js';
 
 const tripInfoTemplate = ({ trip, period, cost }) => `
   <section class="trip-main__trip-info  trip-info">
@@ -12,8 +12,9 @@ const tripInfoTemplate = ({ trip, period, cost }) => `
     </p>
   </section>`;
 
-export default class TripInfoView {
+export default class TripInfoView extends AbstractView {
   constructor({ points, dateFrom, dateTo, cost }) {
+    super();
     const [startDay, startMonth] = getDayMonthString(dateFrom).split(' ');
     const [endDay, endMonth] = getDayMonthString(dateTo).split(' ');
     const trip =
@@ -28,18 +29,7 @@ export default class TripInfoView {
     };
   }
 
-  getTemplate() {
+  get template() {
     return tripInfoTemplate(this.tripInfo);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

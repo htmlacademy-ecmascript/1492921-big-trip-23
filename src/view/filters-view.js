@@ -1,4 +1,4 @@
-import { createElement } from '@src/render.js';
+import AbstractView from '@framework/view/abstract-view.js';
 
 const filterItemTemplate = (name) => {
   const nameLower = name.toLowerCase();
@@ -22,23 +22,13 @@ const filtersTemplate = (items) => `
   </div>
 `;
 
-export default class FiltersView {
+export default class FiltersView extends AbstractView {
   constructor(items) {
+    super();
     this.items = items;
   }
 
-  getTemplate() {
+  get template() {
     return filtersTemplate(this.items);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

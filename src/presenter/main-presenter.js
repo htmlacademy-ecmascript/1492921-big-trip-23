@@ -1,4 +1,4 @@
-import { render, RenderPosition } from '@src/render.js';
+import { render, RenderPosition } from '@framework/render.js';
 import {
   DestinationListModel,
   EventTypeListModel,
@@ -57,8 +57,8 @@ export default class MainPresenter {
     render(
       new EditPointsView(
         item,
-        eventTypeListModel.getEventTypeList(),
-        destinationListModel.getDestinationList(),
+        eventTypeListModel.eventTypeList,
+        destinationListModel.destinationList,
         offerListModel.getOfferList(item ? item.type : 'Flight'),
       ),
       this.tripPoints,
@@ -68,12 +68,12 @@ export default class MainPresenter {
   // Рендеринг событий поездки
   renderPoints() {
     this.renderEditPoint();
-    pointListModel.getPointList().forEach((item, index) => {
+    pointListModel.pointList.forEach((item, index) => {
       if (index === EDIT_POINT_INDEX) {
         this.renderEditPoint(item);
       } else {
         render(
-          new PointView(new PointViewModel(item).getPointView()),
+          new PointView(new PointViewModel(item).pointView),
           this.tripPoints,
         );
       }
