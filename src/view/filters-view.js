@@ -23,12 +23,14 @@ const filtersTemplate = (items) => `
 `;
 
 export default class FiltersView extends AbstractView {
+  #items = null;
+
   constructor(items) {
     super();
-    this.items = items;
+    this.#items = items;
   }
 
   get template() {
-    return filtersTemplate(this.items);
+    return filtersTemplate(this.#items);
   }
 }

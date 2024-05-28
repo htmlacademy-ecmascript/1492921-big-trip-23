@@ -19,12 +19,14 @@ const sortingTemplate = (items) => `
 `;
 
 export default class SortingView extends AbstractView {
+  #items = null;
+
   constructor(items) {
     super();
-    this.items = items;
+    this.#items = items;
   }
 
   get template() {
-    return sortingTemplate(this.items);
+    return sortingTemplate(this.#items);
   }
 }

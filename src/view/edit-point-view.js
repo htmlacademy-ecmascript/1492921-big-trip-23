@@ -1,15 +1,6 @@
+import { BLANK_POINT, Folders } from '@src/const.js';
+import { formatDateTime } from '@utils/datetime.js';
 import AbstractView from '@framework/view/abstract-view.js';
-import { getDateTimeString } from '@utils/datetime.js';
-import { Folders } from '@src/const.js';
-
-const BLANK_POINT = {
-  type: 'Flight',
-  destination: 'Paris',
-  dateFrom: new Date().toISOString(),
-  dateTo: new Date().toISOString(),
-  price: 0,
-  offers: [],
-};
 
 const eventTypeItemTemplate = (name) => {
   const nameLower = name.toLowerCase();
@@ -28,10 +19,10 @@ const eventTypeListTemplate = (items) => `
   </div>
 `;
 
-const offersItemTemplate = ({ code, name, price }, checked) => `
+const offerTemplate = ({ id, name, price }, checked) => `
   <div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden" id="event-offer-${code}-1" type="checkbox" name="event-offer-${code}" ${checked ? 'checked' : ''}>
-    <label class="event__offer-label" for="event-offer-${code}-1">
+    <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}-1" type="checkbox" name="event-offer-${id}" ${checked ? 'checked' : ''}>
+    <label class="event__offer-label" for="event-offer-${id}-1">
       <span class="event__offer-title">${name}</span>
       &plus;&euro;&nbsp;
       <span class="event__offer-price">${price}</span>
@@ -39,14 +30,22 @@ const offersItemTemplate = ({ code, name, price }, checked) => `
   </div>
 `;
 
-const offersTemplate = (items, itemsChecked) =>
-  `${
+const offersTemplate = (items, itemsChecked) => `
+  ${
     items
       ? `
   <section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${items.map((item) => offersItemTemplate(item, itemsChecked.find((element) => element === item.id) !== undefined)).join('')}
+      ${Object.values(items)
+        .map((item) =>
+          offerTemplate(
+            item,
+            itemsChecked.find((element) => element.id === item.id) !==
+              undefined,
+          ),
+        )
+        .join('')}
     </div>
   </section>
 `
@@ -112,10 +111,10 @@ const editPointTemplate = (
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getDateTimeString(dateFrom)}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDateTime(dateFrom)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-start-time" value="${getDateTimeString(dateTo)}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-start-time" value="${formatDateTime(dateTo)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -142,22 +141,28 @@ const editPointTemplate = (
 `;
 
 export default class EditPointsView extends AbstractView {
+  #point = null;
+  #isNewPoint = true;
+  #eventTypeList = null;
+  #destinationList = null;
+  #offerList = null;
+
   constructor(point = BLANK_POINT, eventTypeList, destinationList, offerList) {
     super();
-    this.point = point;
-    this.eventTypeList = eventTypeList;
-    this.destinationList = destinationList;
-    this.offerList = offerList;
-    this.isNew = point === BLANK_POINT;
+    this.#point = point;
+    this.#eventTypeList = eventTypeList;
+    this.#destinationList = destinationList;
+    this.#offerList = offerList;
+    this.#isNewPoint = point === BLANK_POINT;
   }
 
   get template() {
     return editPointTemplate(
-      this.point,
-      this.eventTypeList,
-      this.destinationList,
-      this.offerList,
-      this.isNew,
+      this.#point,
+      this.#eventTypeList,
+      this.#destinationList,
+      this.#offerList,
+      this.#isNewPoint,
     );
   }
 }

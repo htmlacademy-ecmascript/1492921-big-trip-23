@@ -1,12 +1,6 @@
-import { Folders } from '@src/const.js';
+import { DateTimeFormats, Folders } from '@src/const.js';
+import { formatDateTime, getDurationTimeString } from '@utils/datetime.js';
 import AbstractView from '@framework/view/abstract-view.js';
-import {
-  getDateISOString,
-  getDateTimeISOString,
-  getDurationTimeString,
-  getMonthDayString,
-  getTimeString,
-} from '@utils/datetime.js';
 
 const offersItemTemplate = ({ name, price }) => `
   <li class="event__offer">
@@ -34,16 +28,16 @@ const pointTemplate = ({
 }) => `
   <li class="trip-events__item">
     <div class="event">
-    <time class="event__date" datetime="${getDateISOString(dateFrom)}">${getMonthDayString(dateFrom)}</time>
+    <time class="event__date" datetime="${formatDateTime(dateFrom, DateTimeFormats.DATE_ISO)}">${formatDateTime(dateFrom, DateTimeFormats.MONTH_DAY)}</time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="${Folders.ICON}${type.toLowerCase()}.png" alt="Event type icon">
       </div>
       <h3 class="event__title">${type} ${destination}</h3>
       <div class="event__schedule">
         <p class="event__time">
-        <time class="event__start-time" datetime="${getDateTimeISOString(dateFrom)}">${getTimeString(dateFrom)}</time>
+        <time class="event__start-time" datetime="${formatDateTime(dateFrom, DateTimeFormats.DATE_TIME_ISO)}">${formatDateTime(dateFrom, DateTimeFormats.TIME)}</time>
         &mdash;
-        <time class="event__end-time" datetime="${getDateTimeISOString(dateTo)}">${getTimeString(dateTo)}</time>
+        <time class="event__end-time" datetime="${formatDateTime(dateTo, DateTimeFormats.DATE_TIME_ISO)}">${formatDateTime(dateTo, DateTimeFormats.TIME)}</time>
        </p>
         <p class="event__duration">${getDurationTimeString(dateFrom, dateTo)}</p>
       </div>
@@ -62,14 +56,15 @@ const pointTemplate = ({
       </button>
     </div>
   </li>`;
-
 export default class PointView extends AbstractView {
+  #point = null;
+
   constructor(point) {
     super();
-    this.point = point;
+    this.#point = point;
   }
 
   get template() {
-    return pointTemplate(this.point);
+    return pointTemplate(this.#point);
   }
 }
