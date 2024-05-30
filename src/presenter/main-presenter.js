@@ -1,5 +1,5 @@
-import { BLANK_POINT, EDIT_POINT_INDEX } from '@src/const.js';
-import { render, RenderPosition } from '@framework/render.js';
+import { BLANK_POINT } from '@src/const.js';
+import { render, RenderPosition, replace } from '@framework/render.js';
 import {
   DestinationListModel,
   EventTypeListModel,
@@ -61,6 +61,7 @@ export default class MainPresenter {
   }
 
   // Рендеринг формы редактирования данных о поездке
+  /*
   renderEditPoint(item) {
     render(
       new EditPointsView(
@@ -72,24 +73,56 @@ export default class MainPresenter {
       this.#pointList.element,
     );
   }
+  */
 
   #renderPoint(point) {
-    const pointView = new PointView(point);
+    const escKeyDownHandler = (evt) => {
+      if (evt.key === 'Escape') {
+        evt.preventDefault();
+        closeForm();
+      }
+    };
+
+    function closeForm() {
+      toView();
+      document.removeEventListener('keydown', escKeyDownHandler);
+    }
+
+    const pointView = new PointView({
+      point,
+      onEditClick: () => {
+        toEdit();
+        document.addEventListener('keydown', escKeyDownHandler);
+      },
+    });
+    const pointEdit = new EditPointsView({
+      point,
+      onFormSubmit: () => {
+        closeForm();
+      },
+      onCloseClick: () => {
+        closeForm();
+      },
+      eventTypeList: eventTypeListModel.items,
+      destinationList: destinationListModel.items,
+      offerList: offerListModel.items[point ? point.type : BLANK_POINT.type],
+    });
+
+    function toEdit() {
+      replace(pointEdit, pointView);
+    }
+
+    function toView() {
+      replace(pointView, pointEdit);
+    }
 
     render(pointView, this.#pointList.element);
   }
 
   // Рендеринг событий поездки
-  renderPoints() {
-    // отрисовка формы добавления поездки
-    this.renderEditPoint();
-    pointListModel.pointList.forEach((item, index) => {
-      if (index === EDIT_POINT_INDEX) {
-        // отрисовка формы редактирования поездки
-        this.renderEditPoint(item);
-      } else {
-        this.#renderPoint(item);
-      }
+  #renderPoints() {
+    pointListModel.pointList.forEach((item) => {
+      this.#renderPoint(item);
     });
   }
 
@@ -99,6 +132,6 @@ export default class MainPresenter {
     this.#renderFiltres();
     this.renderSorting();
     this.#renderPointList();
-    this.renderPoints();
+    this.#renderPoints();
   }
 }

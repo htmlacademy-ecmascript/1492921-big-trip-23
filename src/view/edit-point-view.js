@@ -1,4 +1,4 @@
-import { BLANK_POINT, Folders } from '@src/const.js';
+import { BLANK_POINT, Folders, HtmlClasses } from '@src/const.js';
 import { formatDateTime } from '@utils/datetime.js';
 import AbstractView from '@framework/view/abstract-view.js';
 
@@ -146,14 +146,35 @@ export default class EditPointsView extends AbstractView {
   #eventTypeList = null;
   #destinationList = null;
   #offerList = null;
+  #handleFormSubmit = null;
+  #handleCloseClick = null;
 
-  constructor(point = BLANK_POINT, eventTypeList, destinationList, offerList) {
+  constructor({
+    point = BLANK_POINT,
+    onFormSubmit,
+    onCloseClick,
+    eventTypeList,
+    destinationList,
+    offerList,
+  }) {
     super();
     this.#point = point;
     this.#eventTypeList = eventTypeList;
     this.#destinationList = destinationList;
     this.#offerList = offerList;
     this.#isNewPoint = point === BLANK_POINT;
+    this.#handleFormSubmit = onFormSubmit;
+    this.#handleCloseClick = onCloseClick;
+
+    this.element
+      .querySelector('form')
+      .addEventListener('submit', this.#formSubmitHandler);
+    this.element
+      .querySelector(`.${HtmlClasses.ROLLUP_BUTTON}`)
+      .addEventListener('click', this.#closeClickHandler);
+    this.element
+      .querySelector('form')
+      .addEventListener('submit', this.#formSubmitHandler);
   }
 
   get template() {
@@ -165,4 +186,14 @@ export default class EditPointsView extends AbstractView {
       this.#isNewPoint,
     );
   }
+
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit();
+  };
+
+  #closeClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleCloseClick();
+  };
 }

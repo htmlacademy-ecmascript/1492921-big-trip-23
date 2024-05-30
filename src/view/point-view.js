@@ -1,4 +1,4 @@
-import { DateTimeFormats, Folders } from '@src/const.js';
+import { DateTimeFormats, Folders, HtmlClasses } from '@src/const.js';
 import { formatDateTime, getDurationTimeString } from '@utils/datetime.js';
 import AbstractView from '@framework/view/abstract-view.js';
 
@@ -51,20 +51,31 @@ const pointTemplate = ({
           <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
         </svg>
       </button>
-      <button class="event__rollup-btn" type="button">
+      <button class="${HtmlClasses.ROLLUP_BUTTON}" type="button">
         <span class="visually-hidden">Open event</span>
       </button>
     </div>
   </li>`;
 export default class PointView extends AbstractView {
   #point = null;
+  #handleEditClick = null;
 
-  constructor(point) {
+  constructor({ point, onEditClick }) {
     super();
     this.#point = point;
+    this.#handleEditClick = onEditClick;
+
+    this.element
+      .querySelector(`.${HtmlClasses.ROLLUP_BUTTON}`)
+      .addEventListener('click', this.#editClickHandler);
   }
 
   get template() {
     return pointTemplate(this.#point);
   }
+
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditClick();
+  };
 }

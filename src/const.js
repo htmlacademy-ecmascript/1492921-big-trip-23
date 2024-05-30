@@ -20,6 +20,7 @@ const BLANK_POINT = {
   offers: [],
 };
 
-const EDIT_POINT_INDEX = 1;
-
-export { DateTimeFormats, Folders, BLANK_POINT, EDIT_POINT_INDEX };
+const HtmlClasses = {
+  ROLLUP_BUTTON: 'event__rollup-btn',
+};
+export { BLANK_POINT, DateTimeFormats, Folders, HtmlClasses };
