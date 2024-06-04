@@ -1,4 +1,4 @@
-import { DateTimeFormats } from '@src/const.js';
+import { DateTimeFormats, MAX_DESTINATION_IN_TRIP_INFO } from '@src/const.js';
 import { formatDateTime } from '@utils/datetime.js';
 import AbstractView from '@framework/view/abstract-view.js';
 
@@ -23,7 +23,7 @@ export default class TripInfoView extends AbstractView {
     const [startDay, startMonth] = dayMonthFom.split(' ');
     const [endDay, endMonth] = dayMonthTo.split(' ');
     const trip =
-      points.length > 3
+      points.length > MAX_DESTINATION_IN_TRIP_INFO
         ? `${points[0]} &mdash; ... &mdash; ${points[points.length - 1]}`
         : points.join(' &mdash; ');
     const period = `${startDay}${startMonth === endMonth ? '' : ` ${startMonth}`} &mdash; ${endDay} ${endMonth}`;

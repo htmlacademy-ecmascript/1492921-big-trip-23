@@ -14,7 +14,9 @@ const eventTypeListTemplate = (items) => `
   <div class="event__type-list">
     <fieldset class="event__type-group">
       <legend class="visually-hidden">Event type</legend>
-        ${items.map((item) => eventTypeItemTemplate(item)).join('')}
+        ${Object.values(items)
+          .map((item) => eventTypeItemTemplate(item))
+          .join('')}
     </fieldset>
   </div>
 `;
