@@ -31,7 +31,7 @@ const getRandomPictures = () => {
   return result;
 };
 
-const eventTypeItems = [
+const eventTypes = [
   'Taxi',
   'Bus',
   'Train',
@@ -43,7 +43,7 @@ const eventTypeItems = [
   'Restaurant',
 ];
 
-const destinationItems = [
+const mokeDestinations = [
   {
     id: 'Amsterdam',
     name: 'Amsterdam',
@@ -73,47 +73,65 @@ const destinationItems = [
   },
 ];
 
-const offerItems = [
-  { id: 'luggage-1', name: 'Add luggage', price: 50 },
-  { id: 'comfort-1', name: 'Switch to comfort', price: 80 },
-  { id: 'meal-1', name: 'Add meal', price: 15 },
-  { id: 'seats-1', name: 'Choose seats', price: 5 },
-  { id: 'train-1', name: 'Travel by train', price: 40 },
-  { id: 'uber-1', name: 'Order Uber', price: 20 },
-  { id: 'car-1', name: 'Rent a car', price: 200 },
-  { id: 'breakfast-1', name: 'Add breakfast', price: 50 },
-  { id: 'tickets-1', name: 'Book tickets', price: 40 },
-  { id: 'lunch-1', name: 'Lunch in city', price: 30 },
-  { id: 'business-1', name: 'Upgrade to a business class', price: 120 },
-];
-
-const eventTypeOffers = [
-  { type: 'Taxi', offers: ['uber-1', 'business-1'] },
-  { type: 'Train', offers: ['luggage-1', 'meal-1'] },
-  { type: 'Ship', offers: ['luggage-1', 'comfort-1', 'meal-1'] },
-  { type: 'Drive', offers: ['car-1'] },
+const mokeOffers = [
+  {
+    type: 'Taxi',
+    offers: [
+      { id: 'uber', name: 'Order Uber', price: 20 },
+      { id: 'business', name: 'Upgrade to a business class', price: 120 },
+    ],
+  },
+  {
+    type: 'Train',
+    offers: [
+      { id: 'luggage', name: 'Add luggage', price: 50 },
+      { id: 'meal', name: 'Add meal', price: 15 },
+    ],
+  },
+  {
+    type: 'Ship',
+    offers: [
+      { id: 'luggage', name: 'Add luggage', price: 50 },
+      { id: 'comfort', name: 'Switch to comfort', price: 80 },
+      { id: 'meal', name: 'Add meal', price: 15 },
+    ],
+  },
+  { type: 'Drive', offers: [{ id: 'car', name: 'Rent a car', price: 200 }] },
   {
     type: 'Flight',
-    offers: ['luggage-1', 'comfort-1', 'meal-1', 'seats-1', 'train-1'],
+    offers: [
+      { id: 'luggage', name: 'Add luggage', price: 50 },
+      { id: 'comfort', name: 'Switch to comfort', price: 80 },
+      { id: 'meal', name: 'Add meal', price: 15 },
+      { id: 'seats', name: 'Choose seats', price: 5 },
+      { id: 'train', name: 'Travel by train', price: 40 },
+    ],
   },
-  { type: 'Check-in', offers: ['breakfast-1'] },
-  { type: 'Sightseeing', offers: ['tickets-1', 'lunch-1'] },
+  {
+    type: 'Check-in',
+    offers: [{ id: 'breakfast', name: 'Add breakfast', price: 50 }],
+  },
+  {
+    type: 'Sightseeing',
+    offers: [
+      { id: 'tickets', name: 'Book tickets', price: 40 },
+      { id: 'lunch', name: 'Lunch in city', price: 30 },
+    ],
+  },
 ];
 
 const getRandomOffers = (eventType) => {
-  const typeOffers = eventTypeOffers.find(
-    (element) => element.type === eventType,
-  );
+  const typeOffers = mokeOffers.find((element) => element.type === eventType);
   if (typeOffers) {
-    const offers = typeOffers.offers;
-    if (offers) {
-      return getRandomArrayElements(offers, getRandomInt(0, offers.length));
-    }
+    return getRandomArrayElements(
+      typeOffers.offers.map((offer) => offer.id),
+      getRandomInt(0, typeOffers.offers.length),
+    );
   }
   return [];
 };
 
-const pointItems = [
+const mokePoints = [
   {
     id: '1',
     type: 'Taxi',
@@ -186,9 +204,9 @@ const pointItems = [
   },
 ];
 
-const randomInt = getRandomInt(MIN_COUNT_POINTS, pointItems.length);
+const randomInt = getRandomInt(MIN_COUNT_POINTS, mokePoints.length);
 
-const randomPoints = getRandomArrayElements(pointItems, randomInt).sort(
+const randomPoints = getRandomArrayElements(mokePoints, randomInt).sort(
   (a, b) => {
     if (a.dateFrom < b.dateFrom) {
       return -1;
@@ -200,11 +218,4 @@ const randomPoints = getRandomArrayElements(pointItems, randomInt).sort(
   },
 );
 
-export {
-  pointItems,
-  eventTypeItems,
-  destinationItems,
-  offerItems,
-  eventTypeOffers,
-  randomPoints,
-};
+export { eventTypes, mokeDestinations, mokeOffers, randomPoints };

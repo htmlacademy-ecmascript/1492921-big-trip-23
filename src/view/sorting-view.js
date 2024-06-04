@@ -1,4 +1,4 @@
-import { createElement } from '@src/render.js';
+import AbstractView from '@framework/view/abstract-view.js';
 
 const sortItemTemplate = (name) => {
   const nameLower = name.toLowerCase();
@@ -18,23 +18,15 @@ const sortingTemplate = (items) => `
   </form>
 `;
 
-export default class SortingView {
+export default class SortingView extends AbstractView {
+  #items = null;
+
   constructor(items) {
-    this.items = items;
+    super();
+    this.#items = items;
   }
 
-  getTemplate() {
-    return sortingTemplate(this.items);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return sortingTemplate(this.#items);
   }
 }

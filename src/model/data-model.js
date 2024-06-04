@@ -1,8 +1,7 @@
 import {
-  destinationItems,
-  eventTypeItems,
-  eventTypeOffers,
-  offerItems,
+  eventTypes,
+  mokeDestinations,
+  mokeOffers,
   randomPoints,
 } from '../mock/mock-data.js';
 
@@ -21,84 +20,70 @@ const SortItems = {
 };
 
 export class EventTypeListModel {
-  constructor() {
-    this.eventTypeList = eventTypeItems;
-  }
+  #items = eventTypes;
 
-  getEventTypeList() {
-    return this.eventTypeList;
+  get items() {
+    return this.#items;
   }
 }
 export class DestinationListModel {
-  constructor() {
-    this.destinationList = destinationItems;
-  }
+  #items = mokeDestinations;
 
-  getDestinationList() {
-    return this.destinationList;
+  get items() {
+    return this.#items;
   }
 }
 export class OfferListModel {
+  #items = {};
+
   constructor() {
-    this.offerList = offerItems;
-    this.offerListEventType = eventTypeOffers;
+    mokeOffers.forEach((element) => {
+      const offers = {};
+      element.offers.forEach((offer) => {
+        offers[offer.id] = offer;
+      });
+      this.#items[element.type] = offers;
+    });
   }
 
-  getOfferList(eventType) {
-    const offerEventType = this.offerListEventType.find(
-      (offer) => offer.type === eventType,
-    );
-    if (offerEventType) {
-      return this.offerList.filter((item) =>
-        offerEventType.offers.includes(item.id),
-      );
-    }
+  get items() {
+    return this.#items;
   }
 }
 
-export class PointViewModel {
-  constructor(point) {
-    this.pointView = point;
-    this.offerList = offerItems;
-  }
-
-  getOffers() {
-    return this.offerList.filter((item) =>
-      this.pointView.offers.includes(item.id),
-    );
-  }
-
-  getPointView() {
-    this.pointView.offers = this.getOffers();
-    return this.pointView;
-  }
-}
 export class PointListModel {
-  constructor() {
-    this.pointList = randomPoints;
-  }
+  #pointList = null;
+  #tripInfo = {};
 
-  getPointList() {
-    return this.pointList;
-  }
+  constructor(offerList) {
+    this.#pointList = randomPoints.map((point) => {
+      point.offers = point.offers.map((item) => offerList[point.type][item]);
+      point.offersCost = point.offers.reduce(
+        (sum, offer) => sum + offer.price,
+        0,
+      );
+      return point;
+    });
 
-  getTripInfo() {
-    return {
+    this.#tripInfo = {
       points: Array.from(
-        new Set(this.pointList.map((item) => item.destination)),
+        new Set(this.#pointList.map((item) => item.destination)),
       ),
-      dateFrom: this.pointList[0].dateFrom,
-      dateTo: this.pointList[this.pointList.length - 1].dateTo,
-      cost: this.pointList.reduce(
-        (cost, item) =>
-          cost +
-          item.price +
-          new PointViewModel(item)
-            .getOffers()
-            .reduce((sum, offer) => sum + offer.price, 0),
+      dateFrom: this.#pointList[0].dateFrom,
+      dateTo: this.#pointList[this.#pointList.length - 1].dateTo,
+      cost: this.#pointList.reduce(
+        (cost, item) => cost + item.price + item.offersCost,
         0,
       ),
     };
+  }
+
+  get pointList() {
+    return this.#pointList;
+  }
+
+  get tripInfo() {
+    return this.#tripInfo;
   }
 }
 
