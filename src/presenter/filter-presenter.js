@@ -17,8 +17,6 @@ const filter = {
     points.filter((point) => isBeforeNow(point.dateTo)),
 };
 
-import PointView from '@view/point-view.js';
-import MessageView from '@view/message-view.js';
 import FiltersView from '@view/filters-view.js';
 
 export default class FilterPresenter {
@@ -29,9 +27,6 @@ export default class FilterPresenter {
   #filterView = null;
   #handleRefresh = null;
   #handleEmptyFilter = null;
-  #pointsContainer = null;
-  #pointList = null;
-  #messageElement = null;
 
   constructor({ points, onRefresh, container, onEmptyFilter }) {
     this.#filtersContainer = container;
@@ -69,5 +64,3 @@ export default class FilterPresenter {
     }
   };
 }
-
-//export { filter };
