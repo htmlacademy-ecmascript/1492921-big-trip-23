@@ -174,9 +174,6 @@ export default class EditPointsView extends AbstractView {
     this.element
       .querySelector(`.${HtmlClasses.ROLLUP_BUTTON}`)
       .addEventListener('click', this.#closeClickHandler);
-    this.element
-      .querySelector('form')
-      .addEventListener('submit', this.#formSubmitHandler);
   }
 
   get template() {

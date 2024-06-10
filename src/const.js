@@ -25,12 +25,18 @@ const HtmlClasses = {
 };
 
 const MAX_DESTINATION_IN_TRIP_INFO = 3;
+const INIT_FILTER_ITEM = 'present';
 
-const Messages = {
+const FilterMessages = {
   EVERYTHING: 'Click New Event to create your first point',
   FUTURE: 'There are no future events now',
   PRESENT: 'There are no present events now',
   PAST: 'There are no past events now',
+};
+
+const IncludeBoundaries = {
+  YES: true,
+  NO: false,
 };
 
 export {
@@ -39,5 +45,7 @@ export {
   Folders,
   HtmlClasses,
   MAX_DESTINATION_IN_TRIP_INFO,
-  Messages,
+  FilterMessages,
+  IncludeBoundaries,
+  INIT_FILTER_ITEM,
 };

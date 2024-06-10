@@ -1,4 +1,4 @@
-import { DateTimeFormats } from '@src/const.js';
+import { DateTimeFormats, IncludeBoundaries } from '@src/const.js';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
@@ -16,4 +16,20 @@ const getDurationTimeString = (dateFrom, dateTo) => {
   );
 };
 
-export { formatDateTime, getDurationTimeString };
+function isBeforeNow(dueDate, isIncludeBoundaries = IncludeBoundaries.NO) {
+  return (
+    dueDate &&
+    dayjs(dueDate).isBefore(dayjs(), 'm') &&
+    (dayjs(dueDate).isSame(dayjs(), 'm') || !isIncludeBoundaries)
+  );
+}
+
+function isAfterNow(dueDate, isIncludeBoundaries = IncludeBoundaries.NO) {
+  return (
+    dueDate &&
+    dayjs(dueDate).isAfter(dayjs(), 'm') &&
+    (dayjs(dueDate).isSame(dayjs(), 'm') || !isIncludeBoundaries)
+  );
+}
+
+export { formatDateTime, getDurationTimeString, isBeforeNow, isAfterNow };

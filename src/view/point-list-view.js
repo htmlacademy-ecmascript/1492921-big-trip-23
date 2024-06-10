@@ -6,4 +6,10 @@ export default class PointListView extends AbstractView {
   get template() {
     return pointListTemplate();
   }
+
+  clear() {
+    while (this.element.firstChild) {
+      this.element.removeChild(this.element.firstChild);
+    }
+  }
 }
