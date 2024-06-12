@@ -1,33 +1,37 @@
 import {
-  eventTypes,
-  mokeDestinations,
-  mokeOffers,
+  mockDestinations,
+  mockOffers,
   randomPoints,
 } from '../mock/mock-data.js';
 
 const FilterItems = {
-  EVERYTHING: 'Everything',
-  FIGURE: 'Future',
-  PRESENT: 'Present',
-  PAST: 'Past',
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PRESENT: 'present',
+  PAST: 'past',
 };
 const SortItems = {
-  DAY: 'Day',
-  EVENT: 'Event',
-  TIME: 'Time',
-  PRICE: 'Price',
-  OFFERS: 'Offers',
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFERS: 'offers',
 };
 
-export class EventTypeListModel {
-  #items = eventTypes;
+const EventTypes = {
+  TAXI: 'Taxi',
+  BUS: 'Bus',
+  TRAIN: 'Train',
+  SHIP: 'Ship',
+  DRIVe: 'Drive',
+  FLIGHT: 'Flight',
+  CHECK_IN: 'Check-in',
+  SIGHTSEEING: 'Sightseeing',
+  RESTAURANT: 'Restaurant',
+};
 
-  get items() {
-    return this.#items;
-  }
-}
 export class DestinationListModel {
-  #items = mokeDestinations;
+  #items = mockDestinations;
 
   get items() {
     return this.#items;
@@ -37,7 +41,7 @@ export class OfferListModel {
   #items = {};
 
   constructor() {
-    mokeOffers.forEach((element) => {
+    mockOffers.forEach((element) => {
       const offers = {};
       element.offers.forEach((offer) => {
         offers[offer.id] = offer;
@@ -53,7 +57,6 @@ export class OfferListModel {
 
 export class PointListModel {
   #pointList = null;
-  #tripInfo = {};
 
   constructor(offerList) {
     this.#pointList = randomPoints.map((point) => {
@@ -64,8 +67,17 @@ export class PointListModel {
       );
       return point;
     });
+  }
 
-    this.#tripInfo = {
+  get pointList() {
+    return this.#pointList;
+  }
+
+  get tripInfo() {
+    if (this.#pointList.length === 0) {
+      return null;
+    }
+    return {
       points: Array.from(
         new Set(this.#pointList.map((item) => item.destination)),
       ),
@@ -77,14 +89,6 @@ export class PointListModel {
       ),
     };
   }
-
-  get pointList() {
-    return this.#pointList;
-  }
-
-  get tripInfo() {
-    return this.#tripInfo;
-  }
 }
 
-export { FilterItems, SortItems };
+export { FilterItems, SortItems, EventTypes };

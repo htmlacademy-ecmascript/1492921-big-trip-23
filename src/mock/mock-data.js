@@ -31,19 +31,7 @@ const getRandomPictures = () => {
   return result;
 };
 
-const eventTypes = [
-  'Taxi',
-  'Bus',
-  'Train',
-  'Ship',
-  'Drive',
-  'Flight',
-  'Check-in',
-  'Sightseeing',
-  'Restaurant',
-];
-
-const mokeDestinations = [
+const mockDestinations = [
   {
     id: 'Amsterdam',
     name: 'Amsterdam',
@@ -73,7 +61,7 @@ const mokeDestinations = [
   },
 ];
 
-const mokeOffers = [
+const mockOffers = [
   {
     type: 'Taxi',
     offers: [
@@ -121,7 +109,7 @@ const mokeOffers = [
 ];
 
 const getRandomOffers = (eventType) => {
-  const typeOffers = mokeOffers.find((element) => element.type === eventType);
+  const typeOffers = mockOffers.find((element) => element.type === eventType);
   if (typeOffers) {
     return getRandomArrayElements(
       typeOffers.offers.map((offer) => offer.id),
@@ -131,7 +119,7 @@ const getRandomOffers = (eventType) => {
   return [];
 };
 
-const mokePoints = [
+const mockPoints = [
   {
     id: '1',
     type: 'Taxi',
@@ -204,9 +192,9 @@ const mokePoints = [
   },
 ];
 
-const randomInt = getRandomInt(MIN_COUNT_POINTS, mokePoints.length);
+const randomInt = getRandomInt(MIN_COUNT_POINTS, mockPoints.length);
 
-const randomPoints = getRandomArrayElements(mokePoints, randomInt).sort(
+const randomPoints = getRandomArrayElements(mockPoints, randomInt).sort(
   (a, b) => {
     if (a.dateFrom < b.dateFrom) {
       return -1;
@@ -218,4 +206,4 @@ const randomPoints = getRandomArrayElements(mokePoints, randomInt).sort(
   },
 );
 
-export { eventTypes, mokeDestinations, mokeOffers, randomPoints };
+export { mockDestinations, mockOffers, randomPoints };

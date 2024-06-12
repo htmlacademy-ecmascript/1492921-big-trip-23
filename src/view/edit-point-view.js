@@ -14,7 +14,9 @@ const eventTypeListTemplate = (items) => `
   <div class="event__type-list">
     <fieldset class="event__type-group">
       <legend class="visually-hidden">Event type</legend>
-        ${items.map((item) => eventTypeItemTemplate(item)).join('')}
+        ${Object.values(items)
+          .map((item) => eventTypeItemTemplate(item))
+          .join('')}
     </fieldset>
   </div>
 `;
@@ -172,9 +174,6 @@ export default class EditPointsView extends AbstractView {
     this.element
       .querySelector(`.${HtmlClasses.ROLLUP_BUTTON}`)
       .addEventListener('click', this.#closeClickHandler);
-    this.element
-      .querySelector('form')
-      .addEventListener('submit', this.#formSubmitHandler);
   }
 
   get template() {

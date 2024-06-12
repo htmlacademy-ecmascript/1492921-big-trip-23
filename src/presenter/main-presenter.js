@@ -1,21 +1,21 @@
-import { BLANK_POINT } from '@src/const.js';
-import { render, RenderPosition, replace } from '@framework/render.js';
+import { BLANK_POINT, INIT_FILTER_ITEM } from '@src/const.js';
+import { remove, render, RenderPosition, replace } from '@framework/render.js';
 import {
   DestinationListModel,
-  EventTypeListModel,
   OfferListModel,
   PointListModel,
 } from '@model/data-model.js';
-import { FilterItems, SortItems } from '@model/data-model.js';
+import { EventTypes, SortItems } from '@model/data-model.js';
 import TripInfoView from '@view/trip-info-view.js';
 import SortingView from '@view/sorting-view.js';
 import PointView from '@view/point-view.js';
 import EditPointsView from '@view/edit-point-view.js';
-import FiltersView from '@view/filters-view.js';
 import PointListView from '@view/point-list-view.js';
+import MessageView from '@view/message-view.js';
+
+import FilterPresenter from '@presenter/filter-presenter.js';
 
 const destinationListModel = new DestinationListModel();
-const eventTypeListModel = new EventTypeListModel();
 const offerListModel = new OfferListModel();
 const pointListModel = new PointListModel(offerListModel.items);
 
@@ -24,6 +24,8 @@ export default class MainPresenter {
   #filtersContainer = null;
   #pointsContainer = null;
   #pointList = null;
+  #messageElement = null;
+  #filterComponent = null;
 
   constructor({ mainContainer, filtersContainer, pointsContainer }) {
     this.#mainContainer = mainContainer;
@@ -41,9 +43,15 @@ export default class MainPresenter {
     );
   }
 
-  // Рендеринг фильтров
-  #renderFiltres() {
-    render(new FiltersView(FilterItems), this.#filtersContainer);
+  // Создание фильтров
+  #createFiltres() {
+    this.#filterComponent = new FilterPresenter({
+      points: pointListModel.pointList,
+      onRefresh: (filterPoints) => this.#renderPoints(filterPoints),
+      container: this.#filtersContainer,
+      onEmptyFilter: (message) => this.#showMessage(message),
+    });
+    this.#filterComponent.init();
   }
 
   // Рендеринг сортировки
@@ -103,7 +111,7 @@ export default class MainPresenter {
       onCloseClick: () => {
         closeForm();
       },
-      eventTypeList: eventTypeListModel.items,
+      eventTypeList: EventTypes,
       destinationList: destinationListModel.items,
       offerList: offerListModel.items[point ? point.type : BLANK_POINT.type],
     });
@@ -120,18 +128,34 @@ export default class MainPresenter {
   }
 
   // Рендеринг событий поездки
-  #renderPoints() {
-    pointListModel.pointList.forEach((item) => {
+  #renderPoints(points) {
+    this.#showMessage();
+    this.#pointList.clear();
+    points.forEach((item) => {
       this.#renderPoint(item);
     });
   }
 
+  // Вывод сообщения
+  #showMessage(message) {
+    if (this.#messageElement) {
+      remove(this.#messageElement);
+    }
+    if (message) {
+      this.#pointList.clear();
+      this.#messageElement = new MessageView(message);
+      render(this.#messageElement, this.#pointsContainer);
+    }
+  }
+
   // Инициализация презентера
   init() {
-    this.#renderTripInfo();
-    this.#renderFiltres();
-    this.renderSorting();
-    this.#renderPointList();
-    this.#renderPoints();
+    this.#createFiltres();
+    if (pointListModel.pointList.length > 0) {
+      this.#renderTripInfo();
+      this.renderSorting();
+      this.#renderPointList();
+    }
+    this.#filterComponent.setFilter(INIT_FILTER_ITEM);
   }
 }
