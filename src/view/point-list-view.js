@@ -9,7 +9,8 @@ export default class PointListView extends AbstractView {
 
   clear() {
     while (this.element.firstChild) {
-      this.element.removeChild(this.element.firstChild);
+      //this.element.removeChild(this.element.firstChild);
+      this.element.firstChild.remove();
     }
   }
 }

@@ -142,7 +142,7 @@ const editPointTemplate = (
   </li>
 `;
 
-export default class EditPointsView extends AbstractView {
+export default class PointEditView extends AbstractView {
   #point = null;
   #isNewPoint = true;
   #eventTypeList = null;

@@ -22,6 +22,7 @@ const BLANK_POINT = {
 
 const HtmlClasses = {
   ROLLUP_BUTTON: 'event__rollup-btn',
+  FAVORITE_BUTTON: 'event__favorite-btn',
 };
 
 const MAX_DESTINATION_IN_TRIP_INFO = 3;
