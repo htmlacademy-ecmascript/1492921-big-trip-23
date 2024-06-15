@@ -14,7 +14,6 @@ const sortingTemplate = (items) => `
       .join('')}
   </form>
 `;
-
 export default class SortingView extends AbstractView {
   #items = null;
   #curentSorting = null;

@@ -5,6 +5,7 @@ import {
   INIT_FILTER_ITEM,
 } from '@src/const.js';
 import { render } from '@framework/render.js';
+import FiltersView from '@view/filters-view.js';
 
 const filter = {
   [FilterItems.EVERYTHING.id]: (points) => points,
@@ -19,9 +20,6 @@ const filter = {
   [FilterItems.PAST.id]: (points) =>
     points.filter((point) => isBeforeNow(point.dateTo)),
 };
-
-import FiltersView from '@view/filters-view.js';
-
 export default class FilterPresenter {
   #filtersContainer = null;
   #filterPoints = {};
@@ -50,14 +48,14 @@ export default class FilterPresenter {
   }
 
   // Фиьтрация данных
-  setFilter = (id) => {
+  setFilter = (filterId) => {
     //this.#filterView.setActiveFilter(filterName);
-    if (this.#filterPoints[id].length === 0) {
-      this.#handleEmptyFilter(FilterItems[id.toUpperCase()].emptyMessage);
+    if (this.#filterPoints[filterId].length === 0) {
+      this.#handleEmptyFilter(FilterItems[filterId.toUpperCase()].emptyMessage);
       return;
     }
     this.#handleEmptyFilter(null);
-    this.#handleRefresh(this.#filterPoints[id]);
+    this.#handleRefresh(this.#filterPoints[filterId]);
   };
 
   // Рендеринг фильтров

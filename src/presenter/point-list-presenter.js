@@ -1,10 +1,11 @@
 import { EventTypes, INIT_SORT_ITEM, SortingItems } from '@src/const.js';
 import { render, RenderPosition } from '@framework/render.js';
+import { DestinationListModel } from '@model/data-model.js';
 import SortingView from '@view/sorting-view.js';
 import PointListView from '@view/point-list-view.js';
 import PointPresenter from '@presenter/point-presenter.js';
 import dayjs from 'dayjs';
-import { DestinationListModel } from '@model/data-model.js';
+
 export default class PointListPresenter {
   #tripEventsContainer = null;
   #pointsModel = null;
