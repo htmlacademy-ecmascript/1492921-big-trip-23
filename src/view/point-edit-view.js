@@ -7,6 +7,8 @@ import {
 import { formatDateTime } from '@utils/datetime.js';
 import AbstractView from '@framework/view/abstract-stateful-view.js';
 import { getEventType } from '@model/data-model.js';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 const eventTypeItemTemplate = (item) => `
   <div class="event__type-item">
