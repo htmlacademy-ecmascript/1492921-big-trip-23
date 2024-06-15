@@ -24,7 +24,7 @@ export default class TripInfoView extends AbstractView {
     const [endDay, endMonth] = dayMonthTo.split(' ');
     const trip =
       points.length > MAX_DESTINATION_IN_TRIP_INFO
-        ? `${points[0]} &mdash; ... &mdash; ${points[points.length - 1]}`
+        ? `${points[0]} &mdash; &hellip; &mdash; ${points[points.length - 1]}`
         : points.join(' &mdash; ');
     const period = `${startDay}${startMonth === endMonth ? '' : ` ${startMonth}`} &mdash; ${endDay} ${endMonth}`;
     this.#tripInfo = {

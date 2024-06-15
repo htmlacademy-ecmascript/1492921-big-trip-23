@@ -38,22 +38,6 @@ export default class MainPresenter {
     this.#filterPresenter.setFilter(INIT_FILTER_ITEM.id);
   }
 
-  // Вывод сообщения
-  showMessage = (message) => {
-    if (this.#messageElement) {
-      remove(this.#messageElement);
-    }
-    if (message) {
-      /*
-      if (this.#pointListPresenter) {
-        this.#pointListPresenter.clearPointList();
-      }
-      */
-      this.#messageElement = new MessageView(message);
-      render(this.#messageElement, this.#tripEventsContainer);
-    }
-  };
-
   // Рендеринг информации о поезке
   #renderTripInfo() {
     render(
@@ -74,11 +58,7 @@ export default class MainPresenter {
     this.#filterPresenter.init();
   }
 
-  #refreshPoints = (points) => {
-    this.#pointListPresenter.refreshPoints(points);
-  };
-
-  // Рендеринг списка точек маршрута
+  // Рендеринг области для вывода списка точек маршрута
   #renderPointList() {
     this.#pointListPresenter = new PointListPresenter({
       tripEventsContainer: this.#tripEventsContainer,
@@ -87,4 +67,20 @@ export default class MainPresenter {
     });
     this.#pointListPresenter.init();
   }
+
+  // Обновление списка точек маршрута
+  #refreshPoints = (points) => {
+    this.#pointListPresenter.refreshPoints(points);
+  };
+
+  // Вывод сообщения
+  showMessage = (message) => {
+    if (this.#messageElement) {
+      remove(this.#messageElement);
+    }
+    if (message) {
+      this.#messageElement = new MessageView(message);
+      render(this.#messageElement, this.#tripEventsContainer);
+    }
+  };
 }
