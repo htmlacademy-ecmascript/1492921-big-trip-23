@@ -23,7 +23,14 @@ const BLANK_POINT = {
 const HtmlClasses = {
   ROLLUP_BUTTON: 'event__rollup-btn',
   FAVORITE_BUTTON: 'event__favorite-btn',
+  EVENT_TYPE: 'event__type-group',
+  EVENT_DESTINATION: 'event__input--destination',
+  EVENT_PRICE: 'event__input--price',
+  EVENT_TIME: 'event__input--time',
+  EVENT_OFFER: 'event__offer-checkbox',
 };
+
+const OFFER_ELEMENT_NAME_PREFIX = 'event-offer-';
 
 const MAX_DESTINATION_IN_TRIP_INFO = 3;
 
@@ -89,4 +96,5 @@ export {
   IncludeBoundaries,
   INIT_FILTER_ITEM,
   INIT_SORT_ITEM,
+  OFFER_ELEMENT_NAME_PREFIX,
 };

@@ -97,7 +97,11 @@ const mockOffers = [
   {
     type: 'flight',
     offers: [
-      { id: 'luggage', title: 'Add luggage', price: 50 },
+      {
+        id: 'b4c3e4e6-9053-42ce-b747-e281314baa31',
+        title: 'Add luggage',
+        price: 50,
+      },
       { id: 'comfort', title: 'Switch to comfort', price: 80 },
       { id: 'meal', title: 'Add meal', price: 15 },
       { id: 'seats', title: 'Choose seats', price: 5 },

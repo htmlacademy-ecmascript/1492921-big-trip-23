@@ -5,18 +5,28 @@ import {
 } from '../mock/mock-data.js';
 import { EventTypes } from '@src/const.js';
 
+const getEventType = (type) => EventTypes[type.toUpperCase().replace('-', '_')];
 export class DestinationListModel {
   #items = mockDestinations;
 
   get items() {
     return this.#items;
   }
+
+  getItemByName(name) {
+    return this.#items.find((element) => element.name === name);
+  }
+
+  getItemById(id) {
+    return this.#items.find((element) => element.id === id);
+  }
 }
 export class OfferListModel {
+  #offers = mockOffers;
   #items = {};
 
   constructor() {
-    mockOffers.forEach((element) => {
+    this.#offers.forEach((element) => {
       const offers = {};
       element.offers.forEach((offer) => {
         offers[offer.id] = offer;
@@ -29,17 +39,18 @@ export class OfferListModel {
     return this.#items;
   }
 }
-
 export class PointListModel {
-  #pointList = null;
+  #items = randomPoints;
+  #tripInfo = {};
 
-  constructor(destinationList, offerList) {
-    this.#pointList = randomPoints.map((point) => {
-      point.offers = point.offers.map((item) => offerList[point.type][item]);
-      point.typeName =
-        EventTypes[point.type.toUpperCase().replace('-', '_')].name;
-      point.destinationName = destinationList.find(
-        (element) => element.id === point.destination,
+  constructor(destinationsModel, offersModel) {
+    this.#items = this.#items.map((point) => {
+      point.offers = point.offers.map(
+        (item) => offersModel.items[point.type][item],
+      );
+      point.typeName = getEventType(point.type).name;
+      point.destinationName = destinationsModel.getItemById(
+        point.destination,
       ).name;
       point.offersCost = point.offers.reduce(
         (sum, offer) => sum + offer.price,
@@ -49,24 +60,24 @@ export class PointListModel {
     });
   }
 
-  get pointList() {
-    return this.#pointList;
+  get items() {
+    return this.#items;
   }
 
   get tripInfo() {
-    if (this.#pointList.length === 0) {
+    if (this.#items.length === 0) {
       return null;
     }
     return {
-      points: Array.from(
-        new Set(this.#pointList.map((item) => item.destination)),
-      ),
-      dateFrom: this.#pointList[0].dateFrom,
-      dateTo: this.#pointList[this.#pointList.length - 1].dateTo,
-      cost: this.#pointList.reduce(
+      points: Array.from(new Set(this.#items.map((item) => item.destination))),
+      dateFrom: this.#items[0].dateFrom,
+      dateTo: this.#items[this.#items.length - 1].dateTo,
+      cost: this.#items.reduce(
         (cost, item) => cost + item.price + item.offersCost,
         0,
       ),
     };
   }
 }
+
+export { getEventType };

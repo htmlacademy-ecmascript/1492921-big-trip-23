@@ -32,15 +32,15 @@ export default class MainPresenter {
     this.#destinationListModel = new DestinationListModel();
     this.#offerListModel = new OfferListModel();
     this.#pointListModel = new PointListModel(
-      this.#destinationListModel.items,
-      this.#offerListModel.items,
+      this.#destinationListModel,
+      this.#offerListModel,
     );
   }
 
   // Инициализация презентера
   init() {
     this.#renderFiltres();
-    if (this.#pointListModel.pointList.length > 0) {
+    if (this.#pointListModel.items.length > 0) {
       this.#renderTripInfo();
       this.#renderPointList();
     }
@@ -59,7 +59,7 @@ export default class MainPresenter {
   // Рендеринг фильтров
   #renderFiltres() {
     this.#filterPresenter = new FilterPresenter({
-      points: this.#pointListModel.pointList,
+      points: this.#pointListModel.items,
       container: this.#filtersContainer,
       onRefresh: this.#refreshPoints,
       onEmptyFilter: this.showMessage,

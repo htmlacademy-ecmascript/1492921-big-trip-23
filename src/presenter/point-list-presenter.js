@@ -11,8 +11,8 @@ export default class PointListPresenter {
   #pointListView = new PointListView();
   #sortingView = null;
 
-  #destinationList = null;
-  #offerList = null;
+  #destinationListModel = null;
+  #offerListModel = null;
 
   #sourcedPoints = [];
   #shownPoints = [];
@@ -27,13 +27,13 @@ export default class PointListPresenter {
   }) {
     this.#tripEventsContainer = tripEventsContainer;
     this.#pointsModel = pointsModel;
-    this.#destinationList = destinationListModel.items;
-    this.#offerList = offerListModel.items;
+    this.#destinationListModel = destinationListModel;
+    this.#offerListModel = offerListModel;
   }
 
   init() {
-    this.#sourcedPoints = [...this.#pointsModel.pointList];
-    this.#shownPoints = [...this.#pointsModel.pointList];
+    this.#sourcedPoints = [...this.#pointsModel.items];
+    this.#shownPoints = [...this.#pointsModel.items];
     this.#renderPointList();
   }
 
@@ -116,8 +116,8 @@ export default class PointListPresenter {
     const pointPresenter = new PointPresenter({
       pointsContainer: this.#pointListView.element,
       eventTypeList: EventTypes,
-      destinationList: this.#destinationList,
-      offerList: this.#offerList,
+      destinationListModel: this.#destinationListModel,
+      offerListModel: this.#offerListModel,
       onDataChange: this.#handlePointChange,
       onModeChange: this.#handleModeChange,
     });
