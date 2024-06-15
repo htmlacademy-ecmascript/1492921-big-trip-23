@@ -4,32 +4,6 @@ import {
   randomPoints,
 } from '../mock/mock-data.js';
 
-const FilterItems = {
-  EVERYTHING: 'everything',
-  FUTURE: 'future',
-  PRESENT: 'present',
-  PAST: 'past',
-};
-const SortItems = {
-  DAY: 'day',
-  EVENT: 'event',
-  TIME: 'time',
-  PRICE: 'price',
-  OFFERS: 'offers',
-};
-
-const EventTypes = {
-  TAXI: 'Taxi',
-  BUS: 'Bus',
-  TRAIN: 'Train',
-  SHIP: 'Ship',
-  DRIVe: 'Drive',
-  FLIGHT: 'Flight',
-  CHECK_IN: 'Check-in',
-  SIGHTSEEING: 'Sightseeing',
-  RESTAURANT: 'Restaurant',
-};
-
 export class DestinationListModel {
   #items = mockDestinations;
 
@@ -90,5 +64,3 @@ export class PointListModel {
     };
   }
 }
-
-export { FilterItems, SortItems, EventTypes };
