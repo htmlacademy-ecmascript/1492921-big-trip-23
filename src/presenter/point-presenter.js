@@ -1,3 +1,4 @@
+import { BLANK_POINT } from '@src/const.js';
 import { remove, render, replace } from '@framework/render.js';
 import { isEscapeKey } from '@utils/keyboard.js';
 import PointView from '@view/point-view.js';
@@ -9,7 +10,7 @@ const Mode = {
 };
 
 export default class PointPresenter {
-  #pointListContainer = null;
+  #pointsContainer = null;
   #pointView = null;
   #pointEdit = null;
 
@@ -24,14 +25,14 @@ export default class PointPresenter {
   #mode = Mode.VIEWING;
 
   constructor({
-    pointListContainer,
+    pointsContainer,
     onDataChange,
     onModeChange,
     eventTypeList,
     destinationList,
     offerList,
   }) {
-    this.#pointListContainer = pointListContainer;
+    this.#pointsContainer = pointsContainer;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
     this.#eventTypeList = eventTypeList;
@@ -47,25 +48,26 @@ export default class PointPresenter {
 
     this.#pointView = new PointView({
       point: this.#point,
-      onEditClick: this.#handleEditClick,
-      onFavoriteClick: this.#handleFavoriteClick,
+      onBtnRollupClick: this.#handleBtnRollupClick,
+      onBtnFavoriteClick: this.#handleBtnFavoriteClick,
     });
 
     this.#pointEdit = new PointEditView({
       point: this.#point,
       onFormSubmit: this.#handleFormSubmit,
-      onCloseClick: this.#handleCloseClick,
+      onBtnRollupClick: this.#handleBtnRollupClick,
       eventTypeList: this.#eventTypeList,
       destinationList: this.#destinationList,
-      offerList: this.#offerList,
+      offerList:
+        this.#offerList[this.#point ? this.#point.type : BLANK_POINT.type],
     });
 
     if (prevPointView === null || prevPointEdit === null) {
-      render(this.#pointView, this.#pointListContainer);
+      render(this.#pointView, this.#pointsContainer);
       return;
     }
 
-    if (this.#mode === Mode.DEFAULT) {
+    if (this.#mode === Mode.VIEWING) {
       replace(this.#pointView, prevPointView);
     }
 
@@ -89,18 +91,15 @@ export default class PointPresenter {
   }
 
   #toEdit() {
+    this.#handleModeChange();
     replace(this.#pointEdit, this.#pointView);
     document.addEventListener('keydown', this.#escKeyDownHandler);
-    this.#handleModeChange();
     this.#mode = Mode.EDITING;
   }
 
   #toView() {
     replace(this.#pointView, this.#pointEdit);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
-    // В учебном проекте этого нет
-    this.#handleModeChange();
-    // -----
     this.#mode = Mode.VIEWING;
   }
 
@@ -111,19 +110,19 @@ export default class PointPresenter {
     }
   };
 
-  #handleFavoriteClick = () => {
+  #handleBtnFavoriteClick = () => {
     this.#handleDataChange({
       ...this.#point,
       isFavorite: !this.#point.isFavorite,
     });
   };
 
-  #handleEditClick = () => {
-    this.#toEdit();
-  };
-
-  #handleCloseClick = () => {
-    this.#toView();
+  #handleBtnRollupClick = () => {
+    if (this.#mode === Mode.VIEWING) {
+      this.#toEdit();
+    } else {
+      this.#toView();
+    }
   };
 
   #handleFormSubmit = (point) => {

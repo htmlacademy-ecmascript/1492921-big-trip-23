@@ -26,13 +26,50 @@ const HtmlClasses = {
 };
 
 const MAX_DESTINATION_IN_TRIP_INFO = 3;
-const INIT_FILTER_ITEM = 'present';
 
-const FilterMessages = {
-  EVERYTHING: 'Click New Event to create your first point',
-  FUTURE: 'There are no future events now',
-  PRESENT: 'There are no present events now',
-  PAST: 'There are no past events now',
+const FilterItems = {
+  EVERYTHING: {
+    id: 'everything',
+    name: 'Everything',
+    emptyMessage: 'Click New Event to create your first point',
+  },
+  FUTURE: {
+    id: 'future',
+    name: 'Future',
+    emptyMessage: 'There are no future events now',
+  },
+  PRESENT: {
+    id: 'present',
+    name: 'Present',
+    emptyMessage: 'There are no present events now',
+  },
+  PAST: {
+    id: 'past',
+    name: 'Past',
+    emptyMessage: 'There are no past events now',
+  },
+};
+const INIT_FILTER_ITEM = FilterItems.EVERYTHING;
+
+const SortingItems = {
+  DAY: { id: 'day', name: 'Day', isCanSort: true },
+  EVENT: { id: 'event', name: 'Event', isCanSort: false },
+  TIME: { id: 'time', name: 'Time', isCanSort: true },
+  PRICE: { id: 'price', name: 'Price', isCanSort: true },
+  OFFERS: { id: 'offers', name: 'Offers', isCanSort: false },
+};
+const INIT_SORT_ITEM = SortingItems.DAY;
+
+const EventTypes = {
+  TAXI: { id: 'taxi', name: 'Taxi' },
+  BUS: { id: 'bus', name: 'Bus' },
+  TRAIN: { id: 'train', name: 'Train' },
+  SHIP: { id: 'ship', name: 'Ship' },
+  DRIVe: { id: 'drive', name: 'Drive' },
+  FLIGHT: { id: 'flight', name: 'Flight' },
+  CHECK_IN: { id: 'check-in', name: 'Check-in' },
+  SIGHTSEEING: { id: 'sightseeing', name: 'Sightseeing' },
+  RESTAURANT: { id: 'restaurant', name: 'Restaurant' },
 };
 
 const IncludeBoundaries = {
@@ -46,7 +83,10 @@ export {
   Folders,
   HtmlClasses,
   MAX_DESTINATION_IN_TRIP_INFO,
-  FilterMessages,
+  FilterItems,
+  SortingItems,
+  EventTypes,
   IncludeBoundaries,
   INIT_FILTER_ITEM,
+  INIT_SORT_ITEM,
 };

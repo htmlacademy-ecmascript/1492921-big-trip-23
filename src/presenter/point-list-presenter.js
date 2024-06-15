@@ -1,8 +1,10 @@
-import { remove, render, RenderPosition, replace } from '@framework/render.js';
+import { EventTypes, INIT_SORT_ITEM, SortingItems } from '@src/const.js';
+import { render, RenderPosition } from '@framework/render.js';
 import SortingView from '@view/sorting-view.js';
 import PointListView from '@view/point-list-view.js';
-import MessageView from '@view/message-view.js';
 import PointPresenter from '@presenter/point-presenter.js';
+import dayjs from 'dayjs';
+import { DestinationListModel } from '@model/data-model.js';
 
 //import BoardView from '../view/board-view.js';
 //import {updateItem} from '../utils/common.js';
@@ -10,157 +12,140 @@ import PointPresenter from '@presenter/point-presenter.js';
 //import {SortType} from '../const.js';
 
 export default class PointListPresenter {
-  #boardContainer = null;
-  #tasksModel = null;
+  #tripEventsContainer = null;
+  #pointsModel = null;
+  #pointListView = new PointListView();
+  #sortingView = null;
+  #pointEdit = null;
 
-  #boardComponent = new BoardView();
-  #taskListComponent = new TaskListView();
-  #loadMoreButtonComponent = null;
-  #sortComponent = null;
-  #noTaskComponent = new NoTaskView();
+  #destinationList = new DestinationListModel().items;
+  #offerList = null;
 
-  #boardTasks = [];
-  #renderedTaskCount = TASK_COUNT_PER_STEP;
-  #taskPresenters = new Map();
-  #currentSortType = SortType.DEFAULT;
-  #sourcedBoardTasks = [];
+  //#boardComponent = new BoardView();
+  //#taskListComponent = new TaskListView();
+  //# adMoreButtonComponent = null;
+  //#noTaskComponent = new NoTaskView();
 
-  constructor({ boardContainer, tasksModel }) {
-    this.#boardContainer = boardContainer;
-    this.#tasksModel = tasksModel;
+  #sourcedPoints = [];
+  #shownPoints = [];
+
+  #pointPresenters = new Map();
+
+  //#currentSortType = INIT_SORT_ITEM;
+
+  constructor({ tripEventsContainer, pointsModel, offerListModel }) {
+    this.#tripEventsContainer = tripEventsContainer;
+    this.#pointsModel = pointsModel;
+    this.#offerList = offerListModel.items;
   }
 
   init() {
-    this.#boardTasks = [...this.#tasksModel.tasks];
-    // 1. В отличии от сортировки по любому параметру,
-    // исходный порядок можно сохранить только одним способом -
-    // сохранив исходный массив:
-    this.#sourcedBoardTasks = [...this.#tasksModel.tasks];
-
-    this.#renderBoard();
+    this.#sourcedPoints = [...this.#pointsModel.pointList];
+    this.#shownPoints = [...this.#pointsModel.pointList];
+    this.#renderPointList();
   }
 
-  #handleLoadMoreButtonClick = () => {
-    this.#renderTasks(
-      this.#renderedTaskCount,
-      this.#renderedTaskCount + TASK_COUNT_PER_STEP,
-    );
-    this.#renderedTaskCount += TASK_COUNT_PER_STEP;
-    if (this.#renderedTaskCount >= this.#boardTasks.length) {
-      remove(this.#loadMoreButtonComponent);
+  refreshPoints = (points = this.#shownPoints) => {
+    this.#clearPoints();
+    if (points !== this.#shownPoints) {
+      this.#shownPoints = [...points];
+      this.#sortingView.activeSorting = INIT_SORT_ITEM.id;
     }
+    this.#renderPoints();
   };
 
-  #handleModeChange = () => {
-    this.#taskPresenters.forEach((presenter) => presenter.resetView());
-  };
+  #renderPointList() {
+    this.#renderSorting();
+    render(this.#pointListView, this.#tripEventsContainer);
+    //this.renderPoints();
+  }
 
-  #handleTaskChange = (updatedTask) => {
-    this.#boardTasks = updateItem(this.#boardTasks, updatedTask);
-    this.#sourcedBoardTasks = updateItem(this.#sourcedBoardTasks, updatedTask);
-    this.#taskPresenters.get(updatedTask.id).init(updatedTask);
-  };
+  #clearPoints() {
+    this.#pointPresenters.forEach((presenter) => presenter.destroy());
+    this.#pointPresenters.clear();
+  }
 
-  #sortTasks(sortType) {
-    // 2. Этот исходный массив задач необходим,
-    // потому что для сортировки мы будем мутировать
-    // массив в свойстве _boardTasks
-    switch (sortType) {
-      case SortType.DATE_UP:
-        this.#boardTasks.sort(sortTaskUp);
+  #renderPoints() {
+    this.#shownPoints.forEach((point) => this.#renderPoint(point));
+  }
+
+  #updatePoint(points, point) {
+    points[points.findIndex((item) => item.id === point.id)] = point;
+  }
+
+  #sortPoints(id) {
+    switch (id) {
+      case SortingItems.DAY.id:
+        // Если с сервера всегда будут загружаться данные, отсортированные по времени, то можно не сортировать и просто брать исходный массив
+        // this.#shownPoints = [...this.#sourcedPoints];
+        // , но об этом в ТЗ ни чего не сказано, и поэтому сортируем всегда
+        this.#shownPoints.sort((pointA, pointB) =>
+          dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom)),
+        );
         break;
-      case SortType.DATE_DOWN:
-        this.#boardTasks.sort(sortTaskDown);
+      case SortingItems.TIME.id:
+        this.#shownPoints.sort(
+          (pointA, pointB) =>
+            dayjs(pointB.dateTo) -
+            dayjs(pointB.dateFrom) -
+            (dayjs(pointA.dateTo) - dayjs(pointA.dateFrom)),
+        );
+        break;
+      case SortingItems.PRICE.id:
+        this.#shownPoints.sort(
+          (pointA, pointB) =>
+            pointB.price +
+            pointB.offersCost -
+            (pointA.price + pointA.offersCost),
+        );
         break;
       default:
-        // 3. А когда пользователь захочет "вернуть всё, как было",
-        // мы просто запишем в _boardTasks исходный массив
-        this.#boardTasks = [...this.#sourcedBoardTasks];
+        throw new Error(
+          `Передан неизвестный тип сортировки (id = ${id})! ${SortingItems.PRICE.id} ${SortingItems.PRICE.id === id}`,
+        );
     }
-
-    this.#currentSortType = sortType;
+    //this.#currentSortType = sortType;
   }
 
-  #handleSortTypeChange = (sortType) => {
-    if (this.#currentSortType === sortType) {
-      return;
-    }
+  #renderSorting() {
+    this.#sortingView = new SortingView({
+      items: SortingItems,
+      onSortingChange: this.#handleSortingChange,
+    });
 
-    this.#sortTasks(sortType);
-    this.#clearTaskList();
-    this.#renderTaskList();
+    render(
+      this.#sortingView,
+      this.#tripEventsContainer,
+      RenderPosition.AFTERBEGIN,
+    );
+    this.#sortingView.setActiveItem = INIT_SORT_ITEM.id;
+  }
+
+  #renderPoint(point) {
+    const pointPresenter = new PointPresenter({
+      pointsContainer: this.#pointListView.element,
+      onDataChange: this.#handlePointChange,
+      onModeChange: this.#handleModeChange,
+      eventTypeList: EventTypes,
+      destinationList: this.#destinationList,
+      offerList: this.#offerList,
+    });
+    pointPresenter.init(point);
+    this.#pointPresenters.set(point.id, pointPresenter);
+  }
+
+  #handleModeChange = () => {
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  #renderSort() {
-    this.#sortComponent = new SortView({
-      onSortTypeChange: this.#handleSortTypeChange,
-    });
+  #handlePointChange = (updatedPoint) => {
+    this.#updatePoint(this.#shownPoints, updatedPoint);
+    this.#updatePoint(this.#sourcedPoints, updatedPoint);
+    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
+  };
 
-    render(
-      this.#sortComponent,
-      this.#boardComponent.element,
-      RenderPosition.AFTERBEGIN,
-    );
-  }
-
-  #renderTask(task) {
-    const taskPresenter = new TaskPresenter({
-      taskListContainer: this.#taskListComponent.element,
-      onDataChange: this.#handleTaskChange,
-      onModeChange: this.#handleModeChange,
-    });
-    taskPresenter.init(task);
-    this.#taskPresenters.set(task.id, taskPresenter);
-  }
-
-  #renderTasks(from, to) {
-    this.#boardTasks.slice(from, to).forEach((task) => this.#renderTask(task));
-  }
-
-  #renderNoTasks() {
-    render(
-      this.#noTaskComponent,
-      this.#boardComponent.element,
-      RenderPosition.AFTERBEGIN,
-    );
-  }
-
-  #renderLoadMoreButton() {
-    this.#loadMoreButtonComponent = new LoadMoreButtonView({
-      onClick: this.#handleLoadMoreButtonClick,
-    });
-
-    render(this.#loadMoreButtonComponent, this.#boardComponent.element);
-  }
-
-  #clearTaskList() {
-    this.#taskPresenters.forEach((presenter) => presenter.destroy());
-    this.#taskPresenters.clear();
-    this.#renderedTaskCount = TASK_COUNT_PER_STEP;
-    remove(this.#loadMoreButtonComponent);
-  }
-
-  #renderTaskList() {
-    render(this.#taskListComponent, this.#boardComponent.element);
-    this.#renderTasks(
-      0,
-      Math.min(this.#boardTasks.length, TASK_COUNT_PER_STEP),
-    );
-
-    if (this.#boardTasks.length > TASK_COUNT_PER_STEP) {
-      this.#renderLoadMoreButton();
-    }
-  }
-
-  #renderBoard() {
-    render(this.#boardComponent, this.#boardContainer);
-
-    if (this.#boardTasks.every((task) => task.isArchive)) {
-      this.#renderNoTasks();
-      return;
-    }
-
-    this.#renderSort();
-    this.#renderTaskList();
-  }
+  #handleSortingChange = (id) => {
+    this.#sortPoints(id);
+    this.refreshPoints();
+  };
 }

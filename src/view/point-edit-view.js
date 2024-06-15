@@ -2,13 +2,11 @@ import { BLANK_POINT, Folders, HtmlClasses } from '@src/const.js';
 import { formatDateTime } from '@utils/datetime.js';
 import AbstractView from '@framework/view/abstract-view.js';
 
-const eventTypeItemTemplate = (name) => {
-  const nameLower = name.toLowerCase();
-  return `<div class="event__type-item">
-    <input id="event-type-${nameLower}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${nameLower}">
-    <label class="event__type-label  event__type-label--${nameLower}" for="event-type-${nameLower}-1">${name}</label>
+const eventTypeItemTemplate = (item) => `
+  <div class="event__type-item">
+    <input id="event-type-${item.id}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${item.id}">
+    <label class="event__type-label  event__type-label--${item.id}" for="event-type-${item.id}-1">${item.name}</label>
   </div>`;
-};
 
 const eventTypeListTemplate = (items) => `
   <div class="event__type-list">
@@ -149,12 +147,12 @@ export default class PointEditView extends AbstractView {
   #destinationList = null;
   #offerList = null;
   #handleFormSubmit = null;
-  #handleCloseClick = null;
+  #handleBtnRollupClick = null;
 
   constructor({
     point = BLANK_POINT,
     onFormSubmit,
-    onCloseClick,
+    onBtnRollupClick,
     eventTypeList,
     destinationList,
     offerList,
@@ -166,14 +164,14 @@ export default class PointEditView extends AbstractView {
     this.#offerList = offerList;
     this.#isNewPoint = point === BLANK_POINT;
     this.#handleFormSubmit = onFormSubmit;
-    this.#handleCloseClick = onCloseClick;
+    this.#handleBtnRollupClick = onBtnRollupClick;
 
     this.element
       .querySelector('form')
       .addEventListener('submit', this.#formSubmitHandler);
     this.element
       .querySelector(`.${HtmlClasses.ROLLUP_BUTTON}`)
-      .addEventListener('click', this.#closeClickHandler);
+      .addEventListener('click', this.#btnRollupClickHandler);
   }
 
   get template() {
@@ -188,11 +186,11 @@ export default class PointEditView extends AbstractView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit();
+    this.#handleFormSubmit(this.#point);
   };
 
-  #closeClickHandler = (evt) => {
+  #btnRollupClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleCloseClick();
+    this.#handleBtnRollupClick();
   };
 }

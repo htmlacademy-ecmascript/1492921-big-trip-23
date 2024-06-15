@@ -24,7 +24,7 @@ const pointTemplate = ({
   dateTo,
   price,
   offers,
-  favorite,
+  isFavorite,
 }) => `
   <li class="trip-events__item">
     <div class="event">
@@ -45,7 +45,7 @@ const pointTemplate = ({
         &euro;&nbsp;<span class="event__price-value">${price}</span>
       </p>
       ${offersTemplate(offers)}
-      <button class="event__favorite-btn${favorite ? ' event__favorite-btn--active"' : '"'} type="button">
+      <button class="event__favorite-btn${isFavorite ? ' event__favorite-btn--active"' : '"'} type="button">
         <span class="visually-hidden">Add to favorite</span>
         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
           <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
@@ -58,18 +58,18 @@ const pointTemplate = ({
   </li>`;
 export default class PointView extends AbstractView {
   #point = null;
-  #handleEditClick = null;
-  #handleFavoriteClick = null;
+  #handleBtnRollupClick = null;
+  #handleBtnFavoriteClick = null;
 
-  constructor({ point, onEditClick, onFavoriteClick }) {
+  constructor({ point, onBtnRollupClick, onBtnFavoriteClick }) {
     super();
     this.#point = point;
-    this.#handleEditClick = onEditClick;
-    this.handleFavoriteClick = onFavoriteClick;
+    this.#handleBtnRollupClick = onBtnRollupClick;
+    this.#handleBtnFavoriteClick = onBtnFavoriteClick;
 
     this.element
       .querySelector(`.${HtmlClasses.ROLLUP_BUTTON}`)
-      .addEventListener('click', this.#editClickHandler);
+      .addEventListener('click', this.#btnRollupClickHandler);
 
     this.element
       .querySelector(`.${HtmlClasses.FAVORITE_BUTTON}`)
@@ -80,13 +80,13 @@ export default class PointView extends AbstractView {
     return pointTemplate(this.#point);
   }
 
-  #editClickHandler = (evt) => {
+  #btnRollupClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleEditClick();
+    this.#handleBtnRollupClick();
   };
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFavoriteClick();
+    this.#handleBtnFavoriteClick();
   };
 }
