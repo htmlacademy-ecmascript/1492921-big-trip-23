@@ -5,33 +5,19 @@ import PointListView from '@view/point-list-view.js';
 import PointPresenter from '@presenter/point-presenter.js';
 import dayjs from 'dayjs';
 import { DestinationListModel } from '@model/data-model.js';
-
-//import BoardView from '../view/board-view.js';
-//import {updateItem} from '../utils/common.js';
-//import {sortTaskUp, sortTaskDown} from '../utils/task.js';
-//import {SortType} from '../const.js';
-
 export default class PointListPresenter {
   #tripEventsContainer = null;
   #pointsModel = null;
   #pointListView = new PointListView();
   #sortingView = null;
-  #pointEdit = null;
 
   #destinationList = new DestinationListModel().items;
   #offerList = null;
-
-  //#boardComponent = new BoardView();
-  //#taskListComponent = new TaskListView();
-  //# adMoreButtonComponent = null;
-  //#noTaskComponent = new NoTaskView();
 
   #sourcedPoints = [];
   #shownPoints = [];
 
   #pointPresenters = new Map();
-
-  //#currentSortType = INIT_SORT_ITEM;
 
   constructor({ tripEventsContainer, pointsModel, offerListModel }) {
     this.#tripEventsContainer = tripEventsContainer;
@@ -45,12 +31,13 @@ export default class PointListPresenter {
     this.#renderPointList();
   }
 
-  refreshPoints = (points = this.#shownPoints) => {
+  refreshPoints = (points = this.#shownPoints, sortId = INIT_SORT_ITEM.id) => {
     this.#clearPoints();
     if (points !== this.#shownPoints) {
       this.#shownPoints = [...points];
-      this.#sortingView.activeSorting = INIT_SORT_ITEM.id;
+      this.#sortingView.activeSorting = sortId;
     }
+    this.#sortPoints(sortId);
     this.#renderPoints();
   };
 
@@ -73,8 +60,8 @@ export default class PointListPresenter {
     points[points.findIndex((item) => item.id === point.id)] = point;
   }
 
-  #sortPoints(id) {
-    switch (id) {
+  #sortPoints(SortId) {
+    switch (SortId) {
       case SortingItems.DAY.id:
         // Если с сервера всегда будут загружаться данные, отсортированные по времени, то можно не сортировать и просто брать исходный массив
         // this.#shownPoints = [...this.#sourcedPoints];
@@ -100,9 +87,7 @@ export default class PointListPresenter {
         );
         break;
       default:
-        throw new Error(
-          `Передан неизвестный тип сортировки (id = ${id})! ${SortingItems.PRICE.id} ${SortingItems.PRICE.id === id}`,
-        );
+        throw new Error(`Передан неизвестный тип сортировки (id = ${SortId})!`);
     }
     //this.#currentSortType = sortType;
   }
@@ -144,8 +129,7 @@ export default class PointListPresenter {
     this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
   };
 
-  #handleSortingChange = (id) => {
-    this.#sortPoints(id);
-    this.refreshPoints();
+  #handleSortingChange = (sortId) => {
+    this.refreshPoints(this.#shownPoints, sortId);
   };
 }

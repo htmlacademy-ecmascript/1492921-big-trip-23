@@ -65,7 +65,7 @@ const EventTypes = {
   BUS: { id: 'bus', name: 'Bus' },
   TRAIN: { id: 'train', name: 'Train' },
   SHIP: { id: 'ship', name: 'Ship' },
-  DRIVe: { id: 'drive', name: 'Drive' },
+  DRIVE: { id: 'drive', name: 'Drive' },
   FLIGHT: { id: 'flight', name: 'Flight' },
   CHECK_IN: { id: 'check-in', name: 'Check-in' },
   SIGHTSEEING: { id: 'sightseeing', name: 'Sightseeing' },
