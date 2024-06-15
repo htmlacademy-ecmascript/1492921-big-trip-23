@@ -1,6 +1,5 @@
 import { EventTypes, INIT_SORT_ITEM, SortingItems } from '@src/const.js';
 import { render, RenderPosition } from '@framework/render.js';
-import { DestinationListModel } from '@model/data-model.js';
 import SortingView from '@view/sorting-view.js';
 import PointListView from '@view/point-list-view.js';
 import PointPresenter from '@presenter/point-presenter.js';
@@ -12,7 +11,7 @@ export default class PointListPresenter {
   #pointListView = new PointListView();
   #sortingView = null;
 
-  #destinationList = new DestinationListModel().items;
+  #destinationList = null;
   #offerList = null;
 
   #sourcedPoints = [];
@@ -20,9 +19,15 @@ export default class PointListPresenter {
 
   #pointPresenters = new Map();
 
-  constructor({ tripEventsContainer, pointsModel, offerListModel }) {
+  constructor({
+    tripEventsContainer,
+    pointsModel,
+    destinationListModel,
+    offerListModel,
+  }) {
     this.#tripEventsContainer = tripEventsContainer;
     this.#pointsModel = pointsModel;
+    this.#destinationList = destinationListModel.items;
     this.#offerList = offerListModel.items;
   }
 
@@ -110,11 +115,11 @@ export default class PointListPresenter {
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
       pointsContainer: this.#pointListView.element,
-      onDataChange: this.#handlePointChange,
-      onModeChange: this.#handleModeChange,
       eventTypeList: EventTypes,
       destinationList: this.#destinationList,
       offerList: this.#offerList,
+      onDataChange: this.#handlePointChange,
+      onModeChange: this.#handleModeChange,
     });
     pointPresenter.init(point);
     this.#pointPresenters.set(point.id, pointPresenter);

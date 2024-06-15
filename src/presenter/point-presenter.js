@@ -1,4 +1,3 @@
-import { BLANK_POINT } from '@src/const.js';
 import { remove, render, replace } from '@framework/render.js';
 import { isEscapeKey } from '@utils/keyboard.js';
 import PointView from '@view/point-view.js';
@@ -33,11 +32,11 @@ export default class PointPresenter {
     offerList,
   }) {
     this.#pointsContainer = pointsContainer;
-    this.#handleDataChange = onDataChange;
-    this.#handleModeChange = onModeChange;
     this.#eventTypeList = eventTypeList;
     this.#destinationList = destinationList;
     this.#offerList = offerList;
+    this.#handleDataChange = onDataChange;
+    this.#handleModeChange = onModeChange;
   }
 
   init(point) {
@@ -54,12 +53,11 @@ export default class PointPresenter {
 
     this.#pointEdit = new PointEditView({
       point: this.#point,
-      onFormSubmit: this.#handleFormSubmit,
-      onBtnRollupClick: this.#handleBtnRollupClick,
       eventTypeList: this.#eventTypeList,
       destinationList: this.#destinationList,
-      offerList:
-        this.#offerList[this.#point ? this.#point.type : BLANK_POINT.type],
+      offerList: this.#offerList,
+      onFormSubmit: this.#handleFormSubmit,
+      onBtnRollupClick: this.#handleBtnRollupClick,
     });
 
     if (prevPointView === null || prevPointEdit === null) {

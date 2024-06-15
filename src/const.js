@@ -61,12 +61,12 @@ const SortingItems = {
 const INIT_SORT_ITEM = SortingItems.DAY;
 
 const EventTypes = {
-  TAXI: { id: 'taxi', name: 'Taxi' },
+  TAXI: { id: 'taxi', name: 'Такси' },
   BUS: { id: 'bus', name: 'Bus' },
   TRAIN: { id: 'train', name: 'Train' },
   SHIP: { id: 'ship', name: 'Ship' },
   DRIVE: { id: 'drive', name: 'Drive' },
-  FLIGHT: { id: 'flight', name: 'Flight' },
+  FLIGHT: { id: 'flight', name: 'Полет' },
   CHECK_IN: { id: 'check-in', name: 'Check-in' },
   SIGHTSEEING: { id: 'sightseeing', name: 'Sightseeing' },
   RESTAURANT: { id: 'restaurant', name: 'Restaurant' },

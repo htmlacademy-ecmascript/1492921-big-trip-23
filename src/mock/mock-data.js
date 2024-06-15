@@ -33,31 +33,40 @@ const getRandomPictures = () => {
 
 const mockDestinations = [
   {
-    id: 'Amsterdam',
+    id: 'amsterdam',
     name: 'Amsterdam',
     description:
       "Amsterdam's main attractions include its historic canals; the Rijksmuseum, the state museum with Dutch Golden Age art; the Van Gogh Museum; the Dam Square, where the Royal Palace of Amsterdam and former city hall are located; the Amsterdam Museum; Stedelijk Museum, with modern art; the Concertgebouw concert hall; the Anne Frank House; the Scheepvaartmuseum, the Natura Artis Magistra; Hortus Botanicus, NEMO, the red-light district and cannabis coffee shops.",
     pictures: getRandomPictures(),
   },
   {
-    id: 'Geneva',
+    id: 'geneva',
     name: 'Geneva',
     description:
       'Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.',
     pictures: getRandomPictures(),
   },
   {
-    id: 'Paris',
+    id: 'paris',
     name: 'Paris',
     description:
       'Paris is the capital and most populous city France. Paris is especially known for its museums and architectural landmarks: the Louvre received 8.9 million visitors in 2023, on track for keeping its position as the most-visited art museum in the world.',
     pictures: getRandomPictures(),
   },
   {
-    id: 'Chamonix',
+    id: 'chamonix',
     name: 'Chamonix',
     description:
       "Chamonix-Mont-Blanc (usually shortened to Chamonix) is a resort area near the junction of France, Switzerland and Italy. At the base of Mont Blanc, the highest summit in the Alps, it's renowned for its skiing.",
+  },
+  {
+    id: 'omsk',
+    name: 'Омск',
+  },
+  {
+    id: 'moscow',
+    name: 'Москва',
+    pictures: getRandomPictures(),
   },
 ];
 
@@ -65,45 +74,45 @@ const mockOffers = [
   {
     type: 'taxi',
     offers: [
-      { id: 'uber', name: 'Order Uber', price: 20 },
-      { id: 'business', name: 'Upgrade to a business class', price: 120 },
+      { id: 'uber', title: 'Order Uber', price: 20 },
+      { id: 'business', title: 'Upgrade to a business class', price: 120 },
     ],
   },
   {
     type: 'train',
     offers: [
-      { id: 'luggage', name: 'Add luggage', price: 50 },
-      { id: 'meal', name: 'Add meal', price: 15 },
+      { id: 'luggage', title: 'Add luggage', price: 50 },
+      { id: 'meal', title: 'Add meal', price: 15 },
     ],
   },
   {
     type: 'ship',
     offers: [
-      { id: 'luggage', name: 'Add luggage', price: 50 },
-      { id: 'comfort', name: 'Switch to comfort', price: 80 },
-      { id: 'meal', name: 'Add meal', price: 15 },
+      { id: 'luggage', title: 'Add luggage', price: 50 },
+      { id: 'comfort', title: 'Switch to comfort', price: 80 },
+      { id: 'meal', title: 'Add meal', price: 15 },
     ],
   },
-  { type: 'drive', offers: [{ id: 'car', name: 'Rent a car', price: 200 }] },
+  { type: 'drive', offers: [{ id: 'car', title: 'Rent a car', price: 200 }] },
   {
     type: 'flight',
     offers: [
-      { id: 'luggage', name: 'Add luggage', price: 50 },
-      { id: 'comfort', name: 'Switch to comfort', price: 80 },
-      { id: 'meal', name: 'Add meal', price: 15 },
-      { id: 'seats', name: 'Choose seats', price: 5 },
-      { id: 'train', name: 'Travel by train', price: 40 },
+      { id: 'luggage', title: 'Add luggage', price: 50 },
+      { id: 'comfort', title: 'Switch to comfort', price: 80 },
+      { id: 'meal', title: 'Add meal', price: 15 },
+      { id: 'seats', title: 'Choose seats', price: 5 },
+      { id: 'train', title: 'Travel by train', price: 40 },
     ],
   },
   {
     type: 'check-in',
-    offers: [{ id: 'breakfast', name: 'Add breakfast', price: 50 }],
+    offers: [{ id: 'breakfast', title: 'Add breakfast', price: 50 }],
   },
   {
     type: 'sightseeing',
     offers: [
-      { id: 'tickets', name: 'Book tickets', price: 40 },
-      { id: 'lunch', name: 'Lunch in city', price: 30 },
+      { id: 'tickets', title: 'Book tickets', price: 40 },
+      { id: 'lunch', title: 'Lunch in city', price: 30 },
     ],
   },
 ];
@@ -123,7 +132,7 @@ const mockPoints = [
   {
     id: '1',
     type: 'taxi',
-    destination: 'Amsterdam',
+    destination: 'amsterdam',
     dateFrom: '2019-03-18T10:30',
     dateTo: '2019-03-18T11:00',
     price: 20,
@@ -133,7 +142,7 @@ const mockPoints = [
   {
     id: '2',
     type: 'drive',
-    destination: 'Chamonix',
+    destination: 'chamonix',
     dateFrom: '2019-03-18T14:30',
     dateTo: '2019-03-18T16:05',
     price: 160,
@@ -143,7 +152,7 @@ const mockPoints = [
   {
     id: '3',
     type: 'flight',
-    destination: 'Geneva',
+    destination: 'geneva',
     dateFrom: '2019-03-19T18:00',
     dateTo: '2019-03-19T19:00',
     price: 20,
@@ -153,7 +162,7 @@ const mockPoints = [
   {
     id: '4',
     type: 'sightseeing',
-    destination: 'Geneva',
+    destination: 'moscow',
     dateFrom: '2019-03-20T11:15',
     dateTo: '2019-03-20T12:15',
     price: 180,
@@ -163,7 +172,7 @@ const mockPoints = [
   {
     id: '5',
     type: 'train',
-    destination: 'Paris',
+    destination: 'paris',
     dateFrom: '2019-03-21T08:00',
     dateTo: '2019-03-22T14:15',
     price: 360,
@@ -173,7 +182,7 @@ const mockPoints = [
   {
     id: '6',
     type: 'bus',
-    destination: 'Paris',
+    destination: 'omsk',
     dateFrom: '2019-03-22T15:00',
     dateTo: '2019-03-22T15:30',
     price: 5,
@@ -183,7 +192,7 @@ const mockPoints = [
   {
     id: '7',
     type: 'check-in',
-    destination: 'Paris',
+    destination: 'paris',
     dateFrom: '2019-03-22T15:40',
     dateTo: '2019-04-23T12:00',
     price: 500,

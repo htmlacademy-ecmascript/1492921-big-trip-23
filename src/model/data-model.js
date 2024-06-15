@@ -3,6 +3,7 @@ import {
   mockOffers,
   randomPoints,
 } from '../mock/mock-data.js';
+import { EventTypes } from '@src/const.js';
 
 export class DestinationListModel {
   #items = mockDestinations;
@@ -32,9 +33,14 @@ export class OfferListModel {
 export class PointListModel {
   #pointList = null;
 
-  constructor(offerList) {
+  constructor(destinationList, offerList) {
     this.#pointList = randomPoints.map((point) => {
       point.offers = point.offers.map((item) => offerList[point.type][item]);
+      point.typeName =
+        EventTypes[point.type.toUpperCase().replace('-', '_')].name;
+      point.destinationName = destinationList.find(
+        (element) => element.id === point.destination,
+      ).name;
       point.offersCost = point.offers.reduce(
         (sum, offer) => sum + offer.price,
         0,

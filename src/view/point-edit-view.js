@@ -1,6 +1,6 @@
 import { BLANK_POINT, Folders, HtmlClasses } from '@src/const.js';
 import { formatDateTime } from '@utils/datetime.js';
-import AbstractView from '@framework/view/abstract-view.js';
+import AbstractView from '@framework/view/abstract-stateful-view.js';
 
 const eventTypeItemTemplate = (item) => `
   <div class="event__type-item">
@@ -19,16 +19,19 @@ const eventTypeListTemplate = (items) => `
   </div>
 `;
 
-const offerTemplate = ({ id, name, price }, checked) => `
+const offerTemplate = (item, checked) => {
+  const { id, title, price } = item;
+  return `
   <div class="event__offer-selector">
     <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}-1" type="checkbox" name="event-offer-${id}" ${checked ? 'checked' : ''}>
     <label class="event__offer-label" for="event-offer-${id}-1">
-      <span class="event__offer-title">${name}</span>
+      <span class="event__offer-title">${title}</span>
       &plus;&euro;&nbsp;
       <span class="event__offer-price">${price}</span>
     </label>
   </div>
-`;
+  `;
+};
 
 const offersTemplate = (items, itemsChecked) => `
   ${
@@ -52,41 +55,41 @@ const offersTemplate = (items, itemsChecked) => `
       : ''
   }`;
 
-const descriptionTemplate = (destination, destinationList, isNew) => {
-  const destinationItem = destinationList.find(
-    (element) => element.id === destination,
-  );
-
-  let picturesTemplate = '';
-  if (destinationItem && destinationItem.description) {
-    if (isNew) {
-      picturesTemplate = `
-        <div class="event__photos-container">
-          <div class="event__photos-tape">
-            ${destinationItem.pictures.map(
-              (picture) =>
-                `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`,
-            )}
-          </div>
-        </div>`;
-    }
+const descriptionTemplate = (destinationInfo) => {
+  if (!destinationInfo) {
+    return '';
+  }
+  const { description, pictures } = destinationInfo;
+  let descriptionHtml = '';
+  if (description) {
+    descriptionHtml = `<p class="event__destination-description">${description}</p>`;
+  }
+  let picturesHtml = '';
+  if (pictures && pictures.length > 0) {
+    picturesHtml = `
+      <div class="event__photos-container">
+        <div class="event__photos-tape">
+          ${pictures.map(
+            (picture) =>
+              `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`,
+          )}
+        </div>
+      </div>`;
+  }
+  if (descriptionHtml || picturesHtml) {
     return `
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">${destinationItem.description}</p>
-        ${picturesTemplate}
+        ${descriptionHtml}
+        ${picturesHtml}
       </section>`;
   }
   return '';
 };
 
-const editPointTemplate = (
-  { type, destination, dateFrom, dateTo, price, offers },
-  eventTypeList,
-  destinationList,
-  offersList,
-  isNew,
-) => `
+const editPointTemplate = (state, eventTypeList, destinationList) => {
+  const { type, dateFrom, dateTo, price, typeName, offers } = state.point;
+  return `
   <li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
       <header class="event__header">
@@ -101,9 +104,9 @@ const editPointTemplate = (
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-            ${type}
+            ${typeName}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${state.destinationInfo.name}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${destinationList.map((item) => `<option value="${item.name}"></option>`).join('')}
           </datalist>
@@ -133,39 +136,48 @@ const editPointTemplate = (
       </header>
 
       <section class="event__details">
-        ${offersTemplate(offersList, offers)}
-        ${descriptionTemplate(destination, destinationList, isNew)}
+        ${offersTemplate(state.availableOffers, offers)}
+        ${descriptionTemplate(state.destinationInfo)}
       </section>
     </form>
   </li>
-`;
+  `;
+};
 
 export default class PointEditView extends AbstractView {
-  #point = null;
-  #isNewPoint = true;
   #eventTypeList = null;
   #destinationList = null;
-  #offerList = null;
   #handleFormSubmit = null;
   #handleBtnRollupClick = null;
 
   constructor({
     point = BLANK_POINT,
-    onFormSubmit,
-    onBtnRollupClick,
     eventTypeList,
     destinationList,
     offerList,
+    onFormSubmit,
+    onBtnRollupClick,
   }) {
     super();
-    this.#point = point;
     this.#eventTypeList = eventTypeList;
     this.#destinationList = destinationList;
-    this.#offerList = offerList;
-    this.#isNewPoint = point === BLANK_POINT;
+    this._setState(
+      PointEditView.parsePointToState(point, offerList, destinationList),
+    );
     this.#handleFormSubmit = onFormSubmit;
     this.#handleBtnRollupClick = onBtnRollupClick;
+    this._restoreHandlers();
+  }
 
+  get template() {
+    return editPointTemplate(
+      this._state,
+      this.#eventTypeList,
+      this.#destinationList,
+    );
+  }
+
+  _restoreHandlers() {
     this.element
       .querySelector('form')
       .addEventListener('submit', this.#formSubmitHandler);
@@ -174,23 +186,27 @@ export default class PointEditView extends AbstractView {
       .addEventListener('click', this.#btnRollupClickHandler);
   }
 
-  get template() {
-    return editPointTemplate(
-      this.#point,
-      this.#eventTypeList,
-      this.#destinationList,
-      this.#offerList,
-      this.#isNewPoint,
-    );
-  }
-
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(this.#point);
+    this.#handleFormSubmit(PointEditView.parseStateToPoint(this._state));
   };
 
   #btnRollupClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleBtnRollupClick();
   };
+
+  static parsePointToState(point, offerList, destinationList) {
+    return {
+      point: { ...point },
+      availableOffers: offerList[point.type],
+      destinationInfo: destinationList.find(
+        (element) => element.id === point.destination,
+      ),
+    };
+  }
+
+  static parseStateToPoint(state) {
+    return { ...state.point };
+  }
 }

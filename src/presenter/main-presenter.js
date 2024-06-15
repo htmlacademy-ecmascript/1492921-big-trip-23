@@ -1,6 +1,10 @@
 import { INIT_FILTER_ITEM } from '@src/const.js';
 import { remove, render, RenderPosition } from '@framework/render.js';
-import { OfferListModel, PointListModel } from '@model/data-model.js';
+import {
+  DestinationListModel,
+  OfferListModel,
+  PointListModel,
+} from '@model/data-model.js';
 import TripInfoView from '@view/trip-info-view.js';
 import MessageView from '@view/message-view.js';
 import FilterPresenter from '@presenter/filter-presenter.js';
@@ -16,6 +20,7 @@ export default class MainPresenter {
 
   #messageElement = null;
 
+  #destinationListModel = null;
   #offerListModel = null;
   #pointListModel = null;
 
@@ -24,8 +29,12 @@ export default class MainPresenter {
     this.#filtersContainer = filtersContainer;
     this.#tripEventsContainer = tripEventsContainer;
 
+    this.#destinationListModel = new DestinationListModel();
     this.#offerListModel = new OfferListModel();
-    this.#pointListModel = new PointListModel(this.#offerListModel.items);
+    this.#pointListModel = new PointListModel(
+      this.#destinationListModel.items,
+      this.#offerListModel.items,
+    );
   }
 
   // Инициализация презентера
@@ -63,6 +72,7 @@ export default class MainPresenter {
     this.#pointListPresenter = new PointListPresenter({
       tripEventsContainer: this.#tripEventsContainer,
       pointsModel: this.#pointListModel,
+      destinationListModel: this.#destinationListModel,
       offerListModel: this.#offerListModel,
     });
     this.#pointListPresenter.init();
