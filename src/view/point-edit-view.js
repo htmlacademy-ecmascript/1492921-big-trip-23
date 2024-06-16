@@ -5,8 +5,7 @@ import {
   OFFER_ELEMENT_NAME_PREFIX,
 } from '@src/const.js';
 import { formatDateTime } from '@utils/datetime.js';
-import AbstractView from '@framework/view/abstract-stateful-view.js';
-import { getEventType } from '@model/data-model.js';
+import AbstractStatefulView from '@framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -20,9 +19,7 @@ const eventTypeListTemplate = (items) => `
   <div class="event__type-list">
     <fieldset class="event__type-group">
       <legend class="visually-hidden">Event type</legend>
-        ${Object.values(items)
-          .map((item) => eventTypeItemTemplate(item))
-          .join('')}
+        ${items.map((item) => eventTypeItemTemplate(item)).join('')}
     </fieldset>
   </div>
 `;
@@ -112,7 +109,7 @@ const editPointTemplate = (state, eventTypeList, destinationList) => {
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="${Folders.ICON}${eventType.id.toLowerCase()}.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="${Folders.ICON}${eventType.id}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
           ${eventTypeListTemplate(eventTypeList)}
@@ -160,10 +157,10 @@ const editPointTemplate = (state, eventTypeList, destinationList) => {
   `;
 };
 
-export default class PointEditView extends AbstractView {
+export default class PointEditView extends AbstractStatefulView {
   #eventTypeList = null;
-  #destinationListModel = null;
-  #offerListModel = null;
+  #destinationList = null;
+  #offerList = null;
   #handleFormSubmit = null;
   #handleBtnRollupClick = null;
   #dates = {};
@@ -171,22 +168,16 @@ export default class PointEditView extends AbstractView {
   constructor({
     point = BLANK_POINT,
     eventTypeList,
-    destinationListModel,
-    offerListModel,
+    destinationList,
+    offerList,
     onFormSubmit,
     onBtnRollupClick,
   }) {
     super();
     this.#eventTypeList = eventTypeList;
-    this.#destinationListModel = destinationListModel;
-    this.#offerListModel = offerListModel;
-    this._setState(
-      PointEditView.parsePointToState(
-        point,
-        this.#destinationListModel,
-        this.#offerListModel,
-      ),
-    );
+    this.#destinationList = destinationList;
+    this.#offerList = offerList;
+    this._setState(this.#parsePointToState(point));
     this.#handleFormSubmit = onFormSubmit;
     this.#handleBtnRollupClick = onBtnRollupClick;
     this._restoreHandlers();
@@ -195,8 +186,8 @@ export default class PointEditView extends AbstractView {
   get template() {
     return editPointTemplate(
       this._state,
-      this.#eventTypeList,
-      this.#destinationListModel.items,
+      this.#eventTypeList.eventTypes,
+      this.#destinationList.destinations,
     );
   }
 
@@ -237,13 +228,7 @@ export default class PointEditView extends AbstractView {
   }
 
   reset(point) {
-    this.updateElement(
-      PointEditView.parsePointToState(
-        point,
-        this.#destinationListModel,
-        this.#offerListModel,
-      ),
-    );
+    this.updateElement(this.#parsePointToState(point));
   }
 
   #setDatepicker(element) {
@@ -273,8 +258,8 @@ export default class PointEditView extends AbstractView {
   #eventTypeChangeHandler = (evt) => {
     evt.preventDefault();
     this.updateElement({
-      eventType: getEventType(evt.target.value),
-      availableOffers: this.#offerListModel.items[evt.target.value],
+      eventType: this.#eventTypeList.getItemById(evt.target.value),
+      availableOffers: this.#offerList.items[evt.target.value],
       offers: [],
     });
   };
@@ -282,7 +267,7 @@ export default class PointEditView extends AbstractView {
   #destionationChangeHandler = (evt) => {
     evt.preventDefault();
     this.updateElement({
-      destination: this.#destinationListModel.getItemByName(evt.target.value),
+      destination: this.#destinationList.getItemByName(evt.target.value),
     });
   };
 
@@ -319,12 +304,12 @@ export default class PointEditView extends AbstractView {
     this._setState({ price: evt.target.value });
   };
 
-  static parsePointToState(point, destinationListModel, offerListModel) {
+  #parsePointToState(point) {
     return {
       ...point,
-      eventType: getEventType(point.type),
-      destination: destinationListModel.getItemById(point.destination),
-      availableOffers: offerListModel.items[point.type],
+      eventType: this.#eventTypeList.getItemById(point.type),
+      destination: this.#destinationList.getItemById(point.destination),
+      availableOffers: this.#offerList.items[point.type],
     };
   }
 

@@ -1,10 +1,9 @@
 import { INIT_FILTER_ITEM } from '@src/const.js';
 import { remove, render, RenderPosition } from '@framework/render.js';
-import {
-  DestinationListModel,
-  OfferListModel,
-  PointListModel,
-} from '@model/data-model.js';
+import EventTypeListModel from '@model/event-type-list-model.js';
+import DestinationListModel from '@model/destination-list-model.js';
+import OfferListModel from '@model/offer-list-model.js';
+import PointListModel from '@model/point-list-model.js';
 import TripInfoView from '@view/trip-info-view.js';
 import MessageView from '@view/message-view.js';
 import FilterPresenter from '@presenter/filter-presenter.js';
@@ -20,27 +19,30 @@ export default class MainPresenter {
 
   #messageElement = null;
 
-  #destinationListModel = null;
-  #offerListModel = null;
-  #pointListModel = null;
+  #eventTypeList = null;
+  #destinationList = null;
+  #offerList = null;
+  #pointList = null;
 
   constructor({ mainContainer, filtersContainer, tripEventsContainer }) {
     this.#mainContainer = mainContainer;
     this.#filtersContainer = filtersContainer;
     this.#tripEventsContainer = tripEventsContainer;
 
-    this.#destinationListModel = new DestinationListModel();
-    this.#offerListModel = new OfferListModel();
-    this.#pointListModel = new PointListModel(
-      this.#destinationListModel,
-      this.#offerListModel,
+    this.#eventTypeList = new EventTypeListModel();
+    this.#destinationList = new DestinationListModel();
+    this.#offerList = new OfferListModel();
+    this.#pointList = new PointListModel(
+      this.#eventTypeList,
+      this.#destinationList,
+      this.#offerList,
     );
   }
 
   // Инициализация презентера
   init() {
     this.#renderFiltres();
-    if (this.#pointListModel.items.length > 0) {
+    if (this.#pointList.points.length > 0) {
       this.#renderTripInfo();
       this.#renderPointList();
     }
@@ -50,7 +52,7 @@ export default class MainPresenter {
   // Рендеринг информации о поезке
   #renderTripInfo() {
     render(
-      new TripInfoView(this.#pointListModel.tripInfo),
+      new TripInfoView(this.#pointList.getTripInfo()),
       this.#mainContainer,
       RenderPosition.AFTERBEGIN,
     );
@@ -59,7 +61,7 @@ export default class MainPresenter {
   // Рендеринг фильтров
   #renderFiltres() {
     this.#filterPresenter = new FilterPresenter({
-      points: this.#pointListModel.items,
+      points: this.#pointList.points,
       container: this.#filtersContainer,
       onRefresh: this.#refreshPoints,
       onEmptyFilter: this.showMessage,
@@ -71,9 +73,10 @@ export default class MainPresenter {
   #renderPointList() {
     this.#pointListPresenter = new PointListPresenter({
       tripEventsContainer: this.#tripEventsContainer,
-      pointsModel: this.#pointListModel,
-      destinationListModel: this.#destinationListModel,
-      offerListModel: this.#offerListModel,
+      pointList: this.#pointList,
+      eventTypeList: this.#eventTypeList,
+      destinationList: this.#destinationList,
+      offerList: this.#offerList,
     });
     this.#pointListPresenter.init();
   }

@@ -17,8 +17,8 @@ export default class PointPresenter {
   #handleModeChange = null;
 
   #eventTypeList = null;
-  #destinationListModel = null;
-  #offerListModel = null;
+  #destinationList = null;
+  #offerList = null;
 
   #point = null;
   #mode = Mode.VIEWING;
@@ -26,15 +26,15 @@ export default class PointPresenter {
   constructor({
     pointsContainer,
     eventTypeList,
-    destinationListModel,
-    offerListModel,
+    destinationList,
+    offerList,
     onDataChange,
     onModeChange,
   }) {
     this.#pointsContainer = pointsContainer;
     this.#eventTypeList = eventTypeList;
-    this.#destinationListModel = destinationListModel;
-    this.#offerListModel = offerListModel;
+    this.#destinationList = destinationList;
+    this.#offerList = offerList;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
   }
@@ -54,8 +54,8 @@ export default class PointPresenter {
     this.#pointEdit = new PointEditView({
       point: this.#point,
       eventTypeList: this.#eventTypeList,
-      destinationListModel: this.#destinationListModel,
-      offerListModel: this.#offerListModel,
+      destinationList: this.#destinationList,
+      offerList: this.#offerList,
       onFormSubmit: this.#handleFormSubmit,
       onBtnRollupClick: this.#handleBtnRollupClick,
     });

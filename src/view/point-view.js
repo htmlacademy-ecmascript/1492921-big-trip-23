@@ -22,7 +22,7 @@ const pointTemplate = ({
   dateFrom,
   dateTo,
   price,
-  typeName,
+  eventTypeName,
   destinationName,
   offers,
   isFavorite,
@@ -33,7 +33,7 @@ const pointTemplate = ({
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="${Folders.ICON}${type}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${typeName} ${destinationName}</h3>
+      <h3 class="event__title">${eventTypeName} ${destinationName}</h3>
       <div class="event__schedule">
         <p class="event__time">
         <time class="event__start-time" datetime="${formatDateTime(dateFrom, DateTimeFormats.DATE_TIME_ISO)}">${formatDateTime(dateFrom, DateTimeFormats.TIME)}</time>

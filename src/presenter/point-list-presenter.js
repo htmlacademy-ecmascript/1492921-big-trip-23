@@ -1,4 +1,4 @@
-import { EventTypes, INIT_SORT_ITEM, SortingItems } from '@src/const.js';
+import { INIT_SORT_ITEM, SortingItems } from '@src/const.js';
 import { render, RenderPosition } from '@framework/render.js';
 import SortingView from '@view/sorting-view.js';
 import PointListView from '@view/point-list-view.js';
@@ -7,12 +7,13 @@ import dayjs from 'dayjs';
 
 export default class PointListPresenter {
   #tripEventsContainer = null;
-  #pointsModel = null;
+  #pointList = null;
+  #eventTypeList = null;
+  #destinationList = null;
+  #offerList = null;
+
   #pointListView = new PointListView();
   #sortingView = null;
-
-  #destinationListModel = null;
-  #offerListModel = null;
 
   #sourcedPoints = [];
   #shownPoints = [];
@@ -21,19 +22,21 @@ export default class PointListPresenter {
 
   constructor({
     tripEventsContainer,
-    pointsModel,
-    destinationListModel,
-    offerListModel,
+    pointList,
+    eventTypeList,
+    destinationList,
+    offerList,
   }) {
     this.#tripEventsContainer = tripEventsContainer;
-    this.#pointsModel = pointsModel;
-    this.#destinationListModel = destinationListModel;
-    this.#offerListModel = offerListModel;
+    this.#pointList = pointList;
+    this.#eventTypeList = eventTypeList;
+    this.#destinationList = destinationList;
+    this.#offerList = offerList;
   }
 
   init() {
-    this.#sourcedPoints = [...this.#pointsModel.items];
-    this.#shownPoints = [...this.#pointsModel.items];
+    this.#sourcedPoints = [...this.#pointList.points];
+    this.#shownPoints = [...this.#pointList.points];
     this.#renderPointList();
   }
 
@@ -43,6 +46,7 @@ export default class PointListPresenter {
       this.#shownPoints = [...points];
       this.#sortingView.activeSorting = sortId;
     }
+
     this.#sortPoints(sortId);
     this.#renderPoints();
   };
@@ -115,9 +119,9 @@ export default class PointListPresenter {
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
       pointsContainer: this.#pointListView.element,
-      eventTypeList: EventTypes,
-      destinationListModel: this.#destinationListModel,
-      offerListModel: this.#offerListModel,
+      eventTypeList: this.#eventTypeList,
+      destinationList: this.#destinationList,
+      offerList: this.#offerList,
       onDataChange: this.#handlePointChange,
       onModeChange: this.#handleModeChange,
     });
