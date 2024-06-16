@@ -2,9 +2,9 @@ import { DateTimeFormats, Folders, HtmlClasses } from '@src/const.js';
 import { formatDateTime, getDurationTimeString } from '@utils/datetime.js';
 import AbstractView from '@framework/view/abstract-view.js';
 
-const offersItemTemplate = ({ name, price }) => `
+const offersItemTemplate = ({ title, price }) => `
   <li class="event__offer">
-    <span class="event__offer-title">${name}</span>
+    <span class="event__offer-title">${title}</span>
     &plus;&euro;&nbsp;
     <span class="event__offer-price">${price}</span>
   </li>
@@ -19,10 +19,11 @@ const offersTemplate = (items) => `
 
 const pointTemplate = ({
   type,
-  destination,
   dateFrom,
   dateTo,
   price,
+  typeName,
+  destinationName,
   offers,
   isFavorite,
 }) => `
@@ -30,9 +31,9 @@ const pointTemplate = ({
     <div class="event">
     <time class="event__date" datetime="${formatDateTime(dateFrom, DateTimeFormats.DATE_ISO)}">${formatDateTime(dateFrom, DateTimeFormats.MONTH_DAY)}</time>
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="${Folders.ICON}${type.toLowerCase()}.png" alt="Event type icon">
+        <img class="event__type-icon" width="42" height="42" src="${Folders.ICON}${type}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${type} ${destination}</h3>
+      <h3 class="event__title">${typeName} ${destinationName}</h3>
       <div class="event__schedule">
         <p class="event__time">
         <time class="event__start-time" datetime="${formatDateTime(dateFrom, DateTimeFormats.DATE_TIME_ISO)}">${formatDateTime(dateFrom, DateTimeFormats.TIME)}</time>

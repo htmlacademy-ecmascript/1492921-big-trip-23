@@ -1,4 +1,3 @@
-import { BLANK_POINT } from '@src/const.js';
 import { remove, render, replace } from '@framework/render.js';
 import { isEscapeKey } from '@utils/keyboard.js';
 import PointView from '@view/point-view.js';
@@ -18,26 +17,26 @@ export default class PointPresenter {
   #handleModeChange = null;
 
   #eventTypeList = null;
-  #destinationList = null;
-  #offerList = null;
+  #destinationListModel = null;
+  #offerListModel = null;
 
   #point = null;
   #mode = Mode.VIEWING;
 
   constructor({
     pointsContainer,
+    eventTypeList,
+    destinationListModel,
+    offerListModel,
     onDataChange,
     onModeChange,
-    eventTypeList,
-    destinationList,
-    offerList,
   }) {
     this.#pointsContainer = pointsContainer;
+    this.#eventTypeList = eventTypeList;
+    this.#destinationListModel = destinationListModel;
+    this.#offerListModel = offerListModel;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
-    this.#eventTypeList = eventTypeList;
-    this.#destinationList = destinationList;
-    this.#offerList = offerList;
   }
 
   init(point) {
@@ -54,12 +53,11 @@ export default class PointPresenter {
 
     this.#pointEdit = new PointEditView({
       point: this.#point,
+      eventTypeList: this.#eventTypeList,
+      destinationListModel: this.#destinationListModel,
+      offerListModel: this.#offerListModel,
       onFormSubmit: this.#handleFormSubmit,
       onBtnRollupClick: this.#handleBtnRollupClick,
-      eventTypeList: this.#eventTypeList,
-      destinationList: this.#destinationList,
-      offerList:
-        this.#offerList[this.#point ? this.#point.type : BLANK_POINT.type],
     });
 
     if (prevPointView === null || prevPointEdit === null) {
@@ -86,6 +84,7 @@ export default class PointPresenter {
 
   resetView() {
     if (this.#mode !== Mode.VIEWING) {
+      this.#pointEdit.reset(this.#point);
       this.#toView();
     }
   }
@@ -121,7 +120,7 @@ export default class PointPresenter {
     if (this.#mode === Mode.VIEWING) {
       this.#toEdit();
     } else {
-      this.#toView();
+      this.resetView();
     }
   };
 

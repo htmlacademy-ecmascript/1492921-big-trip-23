@@ -1,6 +1,5 @@
 import { EventTypes, INIT_SORT_ITEM, SortingItems } from '@src/const.js';
 import { render, RenderPosition } from '@framework/render.js';
-import { DestinationListModel } from '@model/data-model.js';
 import SortingView from '@view/sorting-view.js';
 import PointListView from '@view/point-list-view.js';
 import PointPresenter from '@presenter/point-presenter.js';
@@ -12,23 +11,29 @@ export default class PointListPresenter {
   #pointListView = new PointListView();
   #sortingView = null;
 
-  #destinationList = new DestinationListModel().items;
-  #offerList = null;
+  #destinationListModel = null;
+  #offerListModel = null;
 
   #sourcedPoints = [];
   #shownPoints = [];
 
   #pointPresenters = new Map();
 
-  constructor({ tripEventsContainer, pointsModel, offerListModel }) {
+  constructor({
+    tripEventsContainer,
+    pointsModel,
+    destinationListModel,
+    offerListModel,
+  }) {
     this.#tripEventsContainer = tripEventsContainer;
     this.#pointsModel = pointsModel;
-    this.#offerList = offerListModel.items;
+    this.#destinationListModel = destinationListModel;
+    this.#offerListModel = offerListModel;
   }
 
   init() {
-    this.#sourcedPoints = [...this.#pointsModel.pointList];
-    this.#shownPoints = [...this.#pointsModel.pointList];
+    this.#sourcedPoints = [...this.#pointsModel.items];
+    this.#shownPoints = [...this.#pointsModel.items];
     this.#renderPointList();
   }
 
@@ -110,11 +115,11 @@ export default class PointListPresenter {
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
       pointsContainer: this.#pointListView.element,
+      eventTypeList: EventTypes,
+      destinationListModel: this.#destinationListModel,
+      offerListModel: this.#offerListModel,
       onDataChange: this.#handlePointChange,
       onModeChange: this.#handleModeChange,
-      eventTypeList: EventTypes,
-      destinationList: this.#destinationList,
-      offerList: this.#offerList,
     });
     pointPresenter.init(point);
     this.#pointPresenters.set(point.id, pointPresenter);
