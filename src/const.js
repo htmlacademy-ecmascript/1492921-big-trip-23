@@ -72,6 +72,18 @@ const IncludeBoundaries = {
   NO: false,
 };
 
+const ActionType = {
+  INSERT: 'INSERT',
+  UPDATE: 'UPDATE',
+  DELETE: 'DELETE',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
 export {
   BLANK_POINT,
   DateTimeFormats,
@@ -84,4 +96,6 @@ export {
   INIT_FILTER_ITEM,
   INIT_SORT_ITEM,
   OFFER_ELEMENT_NAME_PREFIX,
+  ActionType,
+  UpdateType,
 };

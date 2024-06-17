@@ -1,7 +1,7 @@
 import { randomPoints } from '../mock/mock-data.js';
 import Observable from '@framework/observable.js';
 import dayjs from 'dayjs';
-import { INIT_SORT_ITEM, SortingItems } from '@src/const.js';
+import { ActionType, INIT_SORT_ITEM, SortingItems } from '@src/const.js';
 
 const SortingFunction = {
   [SortingItems.DAY.id]: (pointA, pointB) =>
@@ -56,6 +56,16 @@ export default class PointListModel extends Observable {
       return this.#offerList.items[point.type][id];
     });
     return point;
+  }
+
+  updateItems(actionType, updateType, point) {
+    if (actionType === ActionType.DELETE) {
+      delete this.#items[point.id];
+      this._notify(updateType);
+      return;
+    }
+    this.#items[point.id] = this.getItem(point);
+    this._notify(updateType, this.#items[point.id]);
   }
 
   getTripInfo(points = this.points) {

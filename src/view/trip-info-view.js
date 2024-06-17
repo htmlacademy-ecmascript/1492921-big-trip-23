@@ -22,7 +22,6 @@ export default class TripInfoView extends AbstractView {
     const dayMonthTo = formatDateTime(dateTo, DateTimeFormats.DAY_MONTH);
     const [startDay, startMonth] = dayMonthFom.split(' ');
     const [endDay, endMonth] = dayMonthTo.split(' ');
-    console.log(destinations);
     const trip =
       destinations.length > MAX_DESTINATION_IN_TRIP_INFO
         ? `${destinations[0]} &mdash; &hellip; &mdash; ${destinations[destinations.length - 1]}`

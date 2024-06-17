@@ -32,6 +32,8 @@ export default class PointListPresenter {
     this.#eventTypeList = eventTypeList;
     this.#destinationList = destinationList;
     this.#offerList = offerList;
+
+    this.#pointList.addObserver(this.#handleModelEvent);
   }
 
   init() {
@@ -122,7 +124,7 @@ export default class PointListPresenter {
       eventTypeList: this.#eventTypeList,
       destinationList: this.#destinationList,
       offerList: this.#offerList,
-      onDataChange: this.#handlePointChange,
+      onDataChange: this.#handleViewAction,
       onModeChange: this.#handleModeChange,
     });
     pointPresenter.init(point);
@@ -133,13 +135,31 @@ export default class PointListPresenter {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 
+  /*
   #handlePointChange = (updatedPoint) => {
     this.#updatePoint(this.#shownPoints, updatedPoint);
     this.#updatePoint(this.#sourcedPoints, updatedPoint);
     this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
   };
+*/
 
   #handleSortingChange = (sortId) => {
     this.refreshPoints(this.#shownPoints, sortId);
+  };
+
+  #handleViewAction = (actionType, updateType, update) => {
+    console.log(actionType, updateType, update);
+    // Здесь будем вызывать обновление модели.
+    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
+    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
+    // update - обновленные данные
+  };
+
+  #handleModelEvent = (updateType, data) => {
+    console.log(updateType, data);
+    // В зависимости от типа изменений решаем, что делать:
+    // - обновить часть списка (например, когда поменялось описание)
+    // - обновить список (например, когда задача ушла в архив)
+    // - обновить всю доску (например, при переключении фильтра)
   };
 }

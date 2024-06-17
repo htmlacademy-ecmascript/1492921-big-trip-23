@@ -34,8 +34,6 @@ export default class FilterPresenter {
     this.#handleEmptyFilter = onEmptyFilter;
 
     this.#filters = Object.entries(filter).map(([id, filterPoints]) => {
-      console.log(id);
-      console.log(points);
       this.#filterPoints[id] = filterPoints(points);
       return {
         id: id,
