@@ -7,6 +7,8 @@ import {
 import { formatDateTime } from '@utils/datetime.js';
 import AbstractView from '@framework/view/abstract-stateful-view.js';
 import { getEventType } from '@model/data-model.js';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 const eventTypeItemTemplate = (item) => `
   <div class="event__type-item">
@@ -131,7 +133,7 @@ const editPointTemplate = (state, eventTypeList, destinationList) => {
           <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDateTime(dateFrom)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-start-time" value="${formatDateTime(dateTo)}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDateTime(dateTo)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -142,7 +144,7 @@ const editPointTemplate = (state, eventTypeList, destinationList) => {
           <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit"}>Save</button>
         <button class="event__reset-btn" type="reset">Delete</button>
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
@@ -164,6 +166,7 @@ export default class PointEditView extends AbstractView {
   #offerListModel = null;
   #handleFormSubmit = null;
   #handleBtnRollupClick = null;
+  #dates = {};
 
   constructor({
     point = BLANK_POINT,
@@ -215,14 +218,22 @@ export default class PointEditView extends AbstractView {
       .addEventListener('change', this.#priceChangeHandler);
     this.element
       .querySelectorAll(`.${HtmlClasses.EVENT_TIME}`)
-      .forEach((element) =>
-        element.addEventListener('change', this.#timeChangeHandler),
-      );
+      .forEach((element) => {
+        this.#setDatepicker(element);
+      });
     this.element
       .querySelectorAll(`.${HtmlClasses.EVENT_OFFER}`)
       .forEach((element) =>
         element.addEventListener('change', this.#offerChangeHandler),
       );
+  }
+
+  removeElement() {
+    super.removeElement();
+    Object.values(this.#dates).forEach((element) => {
+      element.destroy();
+      element = null;
+    });
   }
 
   reset(point) {
@@ -233,6 +244,20 @@ export default class PointEditView extends AbstractView {
         this.#offerListModel,
       ),
     );
+  }
+
+  #setDatepicker(element) {
+    this.#dates[element.name] = flatpickr(element, {
+      enableTime: true,
+      // eslint-disable-next-line camelcase
+      time_24hr: true,
+      dateFormat: 'd/m/y H:i',
+      defaultDate:
+        element.name === 'event-start-time'
+          ? this._state.dateFrom
+          : this._state.dateTo,
+      onChange: this.#timeChangeHandler,
+    });
   }
 
   #formSubmitHandler = (evt) => {
@@ -261,11 +286,10 @@ export default class PointEditView extends AbstractView {
     });
   };
 
-  #timeChangeHandler = (evt) => {
-    evt.preventDefault();
+  #timeChangeHandler = ([dateTime], dateStr, instance) => {
     this._setState({
-      [evt.target.name === 'event-start-time' ? 'dateFrom' : 'dateTo']:
-        evt.target.value,
+      [instance.element.name === 'event-start-time' ? 'dateFrom' : 'dateTo']:
+        dateTime,
     });
   };
 
