@@ -1,62 +1,88 @@
-import { INIT_SORT_ITEM, SortingItems } from '@src/const.js';
-import { render, RenderPosition } from '@framework/render.js';
+import {
+  DEFAULT_FILTER,
+  DEFAULT_SORTING,
+  FilterItems,
+  SortingItems,
+  UpdateType,
+} from '@src/const.js';
+import { remove, render, RenderPosition } from '@framework/render.js';
 import SortingView from '@view/sorting-view.js';
 import PointListView from '@view/point-list-view.js';
+import MessageView from '@view/message-view.js';
 import PointPresenter from '@presenter/point-presenter.js';
-import dayjs from 'dayjs';
-
+import { getFilteredPoints } from '@model/filter-model.js';
+import PointListModel from '@model/point-list-model.js';
 export default class PointListPresenter {
-  #tripEventsContainer = null;
-  #pointList = null;
-  #eventTypeList = null;
-  #destinationList = null;
-  #offerList = null;
+  #container = null;
+  #pointListModel = null;
+  #eventTypeListModel = null;
+  #destinationListModel = null;
+  #offerListModel = null;
+  #filterModel = null;
 
   #pointListView = new PointListView();
   #sortingView = null;
-
-  #sourcedPoints = [];
-  #shownPoints = [];
+  #messageView = null;
 
   #pointPresenters = new Map();
 
-  constructor({
-    tripEventsContainer,
-    pointList,
-    eventTypeList,
-    destinationList,
-    offerList,
-  }) {
-    this.#tripEventsContainer = tripEventsContainer;
-    this.#pointList = pointList;
-    this.#eventTypeList = eventTypeList;
-    this.#destinationList = destinationList;
-    this.#offerList = offerList;
+  #currentSorting = DEFAULT_SORTING.id;
+  #activeFilter = DEFAULT_FILTER.id;
 
-    this.#pointList.addObserver(this.#handleModelEvent);
+  constructor({
+    container,
+    pointListModel,
+    eventTypeListModel,
+    destinationListModel,
+    offerListModel,
+    filterModel,
+  }) {
+    this.#container = container;
+    this.#pointListModel = pointListModel;
+    this.#eventTypeListModel = eventTypeListModel;
+    this.#destinationListModel = destinationListModel;
+    this.#offerListModel = offerListModel;
+    this.#filterModel = filterModel;
+
+    this.#pointListModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
+  }
+
+  get shownPoints() {
+    this.#activeFilter = this.#filterModel.activeFilter;
+    const filteredPoints = getFilteredPoints(
+      this.#pointListModel.points,
+      this.#activeFilter,
+    );
+    return PointListModel.getSortedItems(filteredPoints, this.#currentSorting);
   }
 
   init() {
-    this.#sourcedPoints = [...this.#pointList.points];
-    this.#shownPoints = [...this.#pointList.points];
-    this.#renderPointList();
+    this.#refreshPoints();
   }
 
-  refreshPoints = (points = this.#shownPoints, sortId = INIT_SORT_ITEM.id) => {
+  #refreshPoints() {
+    const points = this.shownPoints;
     this.#clearPoints();
-    if (points !== this.#shownPoints) {
-      this.#shownPoints = [...points];
-      this.#sortingView.activeSorting = sortId;
+    if (points.length === 0) {
+      this.#showMessage(
+        FilterItems[this.#activeFilter.toUpperCase()].emptyMessage,
+      );
+      return;
     }
+    remove(this.#messageView);
+    if (!this.#sortingView) {
+      this.#renderSorting();
+      render(this.#pointListView, this.#container);
+    }
+    this.#renderPoints(points);
+  }
 
-    this.#sortPoints(sortId);
-    this.#renderPoints();
-  };
-
-  #renderPointList() {
-    this.#renderSorting();
-    render(this.#pointListView, this.#tripEventsContainer);
-    //this.renderPoints();
+  #clearPointList() {
+    this.#currentSorting = DEFAULT_SORTING.id;
+    remove(this.#pointListView);
+    remove(this.#sortingView);
+    this.#sortingView = null;
   }
 
   #clearPoints() {
@@ -64,71 +90,39 @@ export default class PointListPresenter {
     this.#pointPresenters.clear();
   }
 
-  #renderPoints() {
-    this.#shownPoints.forEach((point) => this.#renderPoint(point));
-  }
-
-  #updatePoint(points, point) {
-    points[points.findIndex((item) => item.id === point.id)] = point;
-  }
-
-  #sortPoints(SortId) {
-    switch (SortId) {
-      case SortingItems.DAY.id:
-        // Если с сервера всегда будут загружаться данные, отсортированные по времени, то можно не сортировать и просто брать исходный массив
-        // this.#shownPoints = [...this.#sourcedPoints];
-        // , но об этом в ТЗ ни чего не сказано, и поэтому сортируем всегда
-        this.#shownPoints.sort((pointA, pointB) =>
-          dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom)),
-        );
-        break;
-      case SortingItems.TIME.id:
-        this.#shownPoints.sort(
-          (pointA, pointB) =>
-            dayjs(pointB.dateTo) -
-            dayjs(pointB.dateFrom) -
-            (dayjs(pointA.dateTo) - dayjs(pointA.dateFrom)),
-        );
-        break;
-      case SortingItems.PRICE.id:
-        this.#shownPoints.sort(
-          (pointA, pointB) =>
-            pointB.price +
-            pointB.offersCost -
-            (pointA.price + pointA.offersCost),
-        );
-        break;
-      default:
-        throw new Error(`Передан неизвестный тип сортировки (id = ${SortId})!`);
-    }
-    //this.#currentSortType = sortType;
+  #renderPoints(points) {
+    points.forEach((point) => this.#renderPoint(point));
   }
 
   #renderSorting() {
     this.#sortingView = new SortingView({
       items: SortingItems,
+      currentSorting: this.#currentSorting,
       onSortingChange: this.#handleSortingChange,
     });
-
-    render(
-      this.#sortingView,
-      this.#tripEventsContainer,
-      RenderPosition.AFTERBEGIN,
-    );
-    this.#sortingView.setActiveItem = INIT_SORT_ITEM.id;
+    render(this.#sortingView, this.#container, RenderPosition.AFTERBEGIN);
+    this.#sortingView.setActiveItem = DEFAULT_SORTING.id;
   }
 
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
-      pointsContainer: this.#pointListView.element,
-      eventTypeList: this.#eventTypeList,
-      destinationList: this.#destinationList,
-      offerList: this.#offerList,
+      container: this.#pointListView.element,
+      eventTypeListModel: this.#eventTypeListModel,
+      destinationListModel: this.#destinationListModel,
+      offerListModel: this.#offerListModel,
+      currentSorting: this.#currentSorting,
       onDataChange: this.#handleViewAction,
       onModeChange: this.#handleModeChange,
     });
     pointPresenter.init(point);
     this.#pointPresenters.set(point.id, pointPresenter);
+  }
+
+  #showMessage(message) {
+    remove(this.#sortingView);
+    remove(this.#pointListView);
+    this.#messageView = new MessageView(message);
+    render(this.#messageView, this.#container);
   }
 
   #handleModeChange = () => {
@@ -143,23 +137,34 @@ export default class PointListPresenter {
   };
 */
 
-  #handleSortingChange = (sortId) => {
-    this.refreshPoints(this.#shownPoints, sortId);
+  #handleSortingChange = (sortingId) => {
+    /*
+    if (this.#currentSortting === sortingId) {
+      return;
+    }
+    */
+    this.#currentSorting = sortingId;
+    this.#refreshPoints();
+    //this.#clearBoard({resetRenderedTaskCount: true});
+    //this.#renderBoard();
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
-    console.log(actionType, updateType, update);
-    // Здесь будем вызывать обновление модели.
-    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
-    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
-    // update - обновленные данные
+  #handleViewAction = (actionType, updateType, point) => {
+    this.#pointListModel.updateItems(actionType, updateType, point);
   };
 
   #handleModelEvent = (updateType, data) => {
-    console.log(updateType, data);
-    // В зависимости от типа изменений решаем, что делать:
-    // - обновить часть списка (например, когда поменялось описание)
-    // - обновить список (например, когда задача ушла в архив)
-    // - обновить всю доску (например, при переключении фильтра)
+    switch (updateType) {
+      case (UpdateType.PATCH, UpdateType.SMALL):
+        this.#pointPresenters.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR:
+        this.#refreshPoints();
+        break;
+      case UpdateType.MAJOR:
+        this.#clearPointList();
+        this.#refreshPoints();
+        break;
+    }
   };
 }

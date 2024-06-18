@@ -23,6 +23,7 @@ const BLANK_POINT = {
 const HtmlClasses = {
   ROLLUP_BUTTON: 'event__rollup-btn',
   FAVORITE_BUTTON: 'event__favorite-btn',
+  DELETE_BUTTON: 'event__reset-btn',
   EVENT_TYPE: 'event__type-group',
   EVENT_DESTINATION: 'event__input--destination',
   EVENT_PRICE: 'event__input--price',
@@ -56,7 +57,7 @@ const FilterItems = {
     emptyMessage: 'There are no past events now',
   },
 };
-const INIT_FILTER_ITEM = FilterItems.EVERYTHING;
+const DEFAULT_FILTER = FilterItems.EVERYTHING;
 
 const SortingItems = {
   DAY: { id: 'day', name: 'Day', isCanSort: true },
@@ -65,7 +66,7 @@ const SortingItems = {
   PRICE: { id: 'price', name: 'Price', isCanSort: true },
   OFFERS: { id: 'offers', name: 'Offers', isCanSort: false },
 };
-const INIT_SORT_ITEM = SortingItems.DAY;
+const DEFAULT_SORTING = SortingItems.DAY;
 
 const IncludeBoundaries = {
   YES: true,
@@ -93,8 +94,8 @@ export {
   FilterItems,
   SortingItems,
   IncludeBoundaries,
-  INIT_FILTER_ITEM,
-  INIT_SORT_ITEM,
+  DEFAULT_FILTER,
+  DEFAULT_SORTING,
   OFFER_ELEMENT_NAME_PREFIX,
   ActionType,
   UpdateType,

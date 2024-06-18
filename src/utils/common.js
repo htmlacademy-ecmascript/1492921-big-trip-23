@@ -16,4 +16,12 @@ const converArrayToObject = (source, keyName = 'id') => {
   return target;
 };
 
-export { converArrayToObject, getItem };
+const converArrayToMap = (source, keyName = 'id') => {
+  const target = new Map();
+  source.forEach((element) => {
+    target.set(element[keyName], element);
+  });
+  return target;
+};
+
+export { converArrayToMap, converArrayToObject, getItem };

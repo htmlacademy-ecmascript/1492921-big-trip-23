@@ -19,17 +19,27 @@ const getDurationTimeString = (dateFrom, dateTo) => {
 function isBeforeNow(dueDate, isIncludeBoundaries = IncludeBoundaries.NO) {
   return (
     dueDate &&
-    dayjs(dueDate).isBefore(dayjs(), 'm') &&
-    (dayjs(dueDate).isSame(dayjs(), 'm') || !isIncludeBoundaries)
+    (dayjs(dueDate).isBefore(dayjs(), 'm') ||
+      (dayjs(dueDate).isSame(dayjs(), 'm') && isIncludeBoundaries))
   );
 }
 
 function isAfterNow(dueDate, isIncludeBoundaries = IncludeBoundaries.NO) {
   return (
     dueDate &&
-    dayjs(dueDate).isAfter(dayjs(), 'm') &&
-    (dayjs(dueDate).isSame(dayjs(), 'm') || !isIncludeBoundaries)
+    (dayjs(dueDate).isAfter(dayjs(), 'm') ||
+      (dayjs(dueDate).isSame(dayjs(), 'm') && isIncludeBoundaries))
   );
 }
 
-export { formatDateTime, getDurationTimeString, isBeforeNow, isAfterNow };
+function isDatesEqual(dateA, dateB) {
+  return (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'm');
+}
+
+export {
+  formatDateTime,
+  getDurationTimeString,
+  isBeforeNow,
+  isAfterNow,
+  isDatesEqual,
+};

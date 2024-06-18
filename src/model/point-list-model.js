@@ -1,7 +1,7 @@
 import { randomPoints } from '../mock/mock-data.js';
 import Observable from '@framework/observable.js';
 import dayjs from 'dayjs';
-import { ActionType, INIT_SORT_ITEM, SortingItems } from '@src/const.js';
+import { ActionType, DEFAULT_SORTING, SortingItems } from '@src/const.js';
 
 const SortingFunction = {
   [SortingItems.DAY.id]: (pointA, pointB) =>
@@ -10,24 +10,20 @@ const SortingFunction = {
     dayjs(pointB.dateTo) -
     dayjs(pointB.dateFrom) -
     (dayjs(pointA.dateTo) - dayjs(pointA.dateFrom)),
-  [SortingItems.PRICE.id]: (pointA, pointB) =>
-    pointB.price + pointB.offersCost - (pointA.price + pointA.offersCost),
+  [SortingItems.PRICE.id]: (pointA, pointB) => pointB.price - pointA.price,
 };
-
 export default class PointListModel extends Observable {
   #points = randomPoints;
-  #items = {};
-  #eventTypeList = null;
+  #items = new Map();
   #destinationList = null;
   #offerList = null;
 
-  constructor(eventTypeList, destinationList, offerList) {
+  constructor(destinationList, offerList) {
     super();
-    this.#eventTypeList = eventTypeList;
     this.#destinationList = destinationList;
     this.#offerList = offerList;
     this.#points.forEach((element) => {
-      this.#items[element.id] = this.getItem(element);
+      this.#items.set(element.id, element);
     });
   }
 
@@ -37,65 +33,67 @@ export default class PointListModel extends Observable {
 
   get points() {
     if (this.#items) {
-      return Object.values(this.#items);
+      return Array.from(this.#items.values());
     }
     return null;
   }
 
-  getItem(point) {
-    if (!point.id) {
-      point.id = this.#points.length + 1;
-    }
-    point.eventTypeName = this.#eventTypeList.getItemById(point.type).name;
-    point.destinationName = this.#destinationList.getItemById(
-      point.destination,
-    ).name;
-    point.offersCost = 0;
-    point.offers = point.offers.map((id) => {
-      point.offersCost += this.#offerList.items[point.type][id].price;
-      return this.#offerList.items[point.type][id];
-    });
-    return point;
-  }
-
   updateItems(actionType, updateType, point) {
     if (actionType === ActionType.DELETE) {
-      delete this.#items[point.id];
+      this.#items.delete(point.id);
       this._notify(updateType);
       return;
     }
-    this.#items[point.id] = this.getItem(point);
-    this._notify(updateType, this.#items[point.id]);
+    this.#items.set(point.id, point);
+    console.log('UPDATE');
+    console.log(point);
+    console.log(updateType);
+    this._notify(updateType, point);
   }
 
   getTripInfo(points = this.points) {
     if (points.length === 0) {
       return null;
     }
-    const pointsSorting = this.#getSortingItems(points, SortingItems.DAY.id);
-    const destinationsDistinct = Array.from(
-      new Set(pointsSorting.map((item) => item.destinationName)),
+    const pointsSortied = PointListModel.getSortedItems(
+      points,
+      SortingItems.DAY.id,
     );
+    const destinationsDistinct = Array.from(
+      new Set(
+        pointsSortied.map(
+          (item) => this.#destinationList.items[item.destination].name,
+        ),
+      ),
+    );
+    const lastDestionation =
+      this.#destinationList.items[
+        pointsSortied[pointsSortied.length - 1].destination
+      ].name;
     if (
-      destinationsDistinct[destinationsDistinct.length - 1] !==
-      pointsSorting[pointsSorting.length - 1].destinationName
+      destinationsDistinct[destinationsDistinct.length - 1] !== lastDestionation
     ) {
-      destinationsDistinct.push(
-        pointsSorting[pointsSorting.length - 1].destinationName,
-      );
+      destinationsDistinct.push(lastDestionation);
     }
     return {
       destinations: destinationsDistinct,
-      dateFrom: pointsSorting[0].dateFrom,
-      dateTo: pointsSorting[pointsSorting.length - 1].dateTo,
-      cost: pointsSorting.reduce(
-        (cost, item) => cost + item.price + item.offersCost,
+      dateFrom: pointsSortied[0].dateFrom,
+      dateTo: pointsSortied[pointsSortied.length - 1].dateTo,
+      cost: pointsSortied.reduce(
+        (total, point) =>
+          total +
+          point.price +
+          point.offers.reduce(
+            (cost, offerId) =>
+              cost + this.#offerList.items[point.type][offerId].price,
+            0,
+          ),
         0,
       ),
     };
   }
 
-  #getSortingItems(items, sortId) {
+  static getSortedItems(items, sortId = DEFAULT_SORTING.id) {
     return items.sort(SortingFunction[sortId]);
   }
 }

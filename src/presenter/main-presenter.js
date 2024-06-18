@@ -1,11 +1,14 @@
-import { INIT_FILTER_ITEM } from '@src/const.js';
 import { remove, render, RenderPosition } from '@framework/render.js';
+import { UpdateType } from '@src/const.js';
+
 import EventTypeListModel from '@model/event-type-list-model.js';
 import DestinationListModel from '@model/destination-list-model.js';
 import OfferListModel from '@model/offer-list-model.js';
 import PointListModel from '@model/point-list-model.js';
+import FilterModel from '@model/filter-model.js';
+
 import TripInfoView from '@view/trip-info-view.js';
-import MessageView from '@view/message-view.js';
+
 import FilterPresenter from '@presenter/filter-presenter.js';
 import PointListPresenter from '@presenter/point-list-presenter.js';
 
@@ -17,54 +20,57 @@ export default class MainPresenter {
   #filterPresenter = null;
   #pointListPresenter = null;
 
-  #messageElement = null;
+  #eventTypeListModel = null;
+  #destinationListModel = null;
+  #offerListModel = null;
+  #pointListModel = null;
+  #filterModel = null;
 
-  #eventTypeList = null;
-  #destinationList = null;
-  #offerList = null;
-  #pointList = null;
+  #tripInfoView = null;
 
   constructor({ mainContainer, filtersContainer, tripEventsContainer }) {
     this.#mainContainer = mainContainer;
     this.#filtersContainer = filtersContainer;
     this.#tripEventsContainer = tripEventsContainer;
 
-    this.#eventTypeList = new EventTypeListModel();
-    this.#destinationList = new DestinationListModel();
-    this.#offerList = new OfferListModel();
-    this.#pointList = new PointListModel(
-      this.#eventTypeList,
-      this.#destinationList,
-      this.#offerList,
+    this.#eventTypeListModel = new EventTypeListModel();
+    this.#destinationListModel = new DestinationListModel();
+    this.#offerListModel = new OfferListModel();
+    this.#pointListModel = new PointListModel(
+      this.#destinationListModel,
+      this.#offerListModel,
     );
+    this.#filterModel = new FilterModel();
+
+    this.#pointListModel.addObserver(this.#handleModelEvent);
   }
 
   // Инициализация презентера
   init() {
     this.#renderFiltres();
-    if (this.#pointList.points.length > 0) {
-      this.#renderTripInfo();
-      this.#renderPointList();
-    }
-    this.#filterPresenter.setFilter(INIT_FILTER_ITEM.id);
+    this.#renderPointList();
+    this.#refreshTripInfo();
   }
 
-  // Рендеринг информации о поезке
-  #renderTripInfo() {
-    render(
-      new TripInfoView(this.#pointList.getTripInfo()),
-      this.#mainContainer,
-      RenderPosition.AFTERBEGIN,
-    );
+  // Отображение информации о поезке
+  #refreshTripInfo() {
+    remove(this.#tripInfoView);
+    if (this.#pointListModel.points.length > 0) {
+      this.#tripInfoView = new TripInfoView(this.#pointListModel.getTripInfo());
+      render(
+        this.#tripInfoView,
+        this.#mainContainer,
+        RenderPosition.AFTERBEGIN,
+      );
+    }
   }
 
   // Рендеринг фильтров
   #renderFiltres() {
     this.#filterPresenter = new FilterPresenter({
-      points: this.#pointList.points,
       container: this.#filtersContainer,
-      onRefresh: this.#refreshPoints,
-      onEmptyFilter: this.showMessage,
+      filterModel: this.#filterModel,
+      pointListModel: this.#pointListModel,
     });
     this.#filterPresenter.init();
   }
@@ -72,28 +78,20 @@ export default class MainPresenter {
   // Рендеринг области для вывода списка точек маршрута
   #renderPointList() {
     this.#pointListPresenter = new PointListPresenter({
-      tripEventsContainer: this.#tripEventsContainer,
-      pointList: this.#pointList,
-      eventTypeList: this.#eventTypeList,
-      destinationList: this.#destinationList,
-      offerList: this.#offerList,
+      container: this.#tripEventsContainer,
+      pointListModel: this.#pointListModel,
+      eventTypeListModel: this.#eventTypeListModel,
+      destinationListModel: this.#destinationListModel,
+      offerListModel: this.#offerListModel,
+      filterModel: this.#filterModel,
     });
     this.#pointListPresenter.init();
   }
 
-  // Обновление списка точек маршрута
-  #refreshPoints = (points) => {
-    this.#pointListPresenter.refreshPoints(points);
-  };
-
-  // Вывод сообщения
-  showMessage = (message) => {
-    if (this.#messageElement) {
-      remove(this.#messageElement);
+  #handleModelEvent = (updateType, data) => {
+    if (updateType === UpdateType.PATCH) {
+      return;
     }
-    if (message) {
-      this.#messageElement = new MessageView(message);
-      render(this.#messageElement, this.#tripEventsContainer);
-    }
+    this.#refreshTripInfo();
   };
 }
