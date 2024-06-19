@@ -12,10 +12,10 @@ const Folders = {
 };
 
 const BLANK_POINT = {
-  type: 'Flight',
-  destination: 'Paris',
-  dateFrom: new Date().toISOString(),
-  dateTo: new Date().toISOString(),
+  type: 'flight',
+  destination: '',
+  dateFrom: null,
+  dateTo: null,
   price: 0,
   offers: [],
 };
@@ -24,14 +24,13 @@ const HtmlClasses = {
   ROLLUP_BUTTON: 'event__rollup-btn',
   FAVORITE_BUTTON: 'event__favorite-btn',
   DELETE_BUTTON: 'event__reset-btn',
+  INSERT_BUTTON: 'trip-main__event-add-btn',
   EVENT_TYPE: 'event__type-group',
   EVENT_DESTINATION: 'event__input--destination',
   EVENT_PRICE: 'event__input--price',
   EVENT_TIME: 'event__input--time',
   EVENT_OFFER: 'event__offer-checkbox',
 };
-
-const OFFER_ELEMENT_NAME_PREFIX = 'event-offer-';
 
 const MAX_DESTINATION_IN_TRIP_INFO = 3;
 
@@ -73,6 +72,11 @@ const IncludeBoundaries = {
   NO: false,
 };
 
+const IsNotify = {
+  YES: true,
+  NO: false,
+};
+
 const ActionType = {
   INSERT: 'INSERT',
   UPDATE: 'UPDATE',
@@ -81,12 +85,25 @@ const ActionType = {
 
 const UpdateType = {
   PATCH: 'PATCH',
+  SMALL: 'SMALL',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
 };
 
+const FormMode = {
+  INSERTING: 'INSERTING',
+  EDITING: 'EDITING',
+  VIEWING: 'VIEWING',
+};
+
+const CaptionBtnDelete = {
+  INSERTING: 'Cancel',
+  EDITING: 'Delete',
+};
+
 export {
   BLANK_POINT,
+  //BLANK_POINT_ID,
   DateTimeFormats,
   Folders,
   HtmlClasses,
@@ -96,7 +113,9 @@ export {
   IncludeBoundaries,
   DEFAULT_FILTER,
   DEFAULT_SORTING,
-  OFFER_ELEMENT_NAME_PREFIX,
   ActionType,
   UpdateType,
+  FormMode,
+  CaptionBtnDelete,
+  IsNotify,
 };

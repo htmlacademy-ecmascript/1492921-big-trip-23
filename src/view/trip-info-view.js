@@ -27,6 +27,7 @@ export default class TripInfoView extends AbstractView {
         ? `${destinations[0]} &mdash; &hellip; &mdash; ${destinations[destinations.length - 1]}`
         : destinations.join(' &mdash; ');
     const period = `${startDay}${startMonth === endMonth ? '' : ` ${startMonth}`} &mdash; ${endDay} ${endMonth}`;
+    //console.log(`cost = ${cost}`);
     this.#tripInfo = {
       trip,
       period,

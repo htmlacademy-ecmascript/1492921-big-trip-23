@@ -3,12 +3,7 @@ import { isEscapeKey } from '@utils/keyboard.js';
 import { isDatesEqual } from '@utils/datetime.js';
 import PointView from '@view/point-view.js';
 import PointEditView from '@view/point-edit-view.js';
-import { ActionType, SortingItems, UpdateType } from '@src/const.js';
-
-const Mode = {
-  VIEWING: 'VIEWING',
-  EDITING: 'EDITING',
-};
+import { ActionType, FormMode, SortingItems, UpdateType } from '@src/const.js';
 
 export default class PointPresenter {
   #container = null;
@@ -23,7 +18,7 @@ export default class PointPresenter {
   #offerListModel = null;
 
   #point = null;
-  #mode = Mode.VIEWING;
+  #mode = FormMode.VIEWING;
   #currentSorting = null;
 
   constructor({
@@ -65,6 +60,7 @@ export default class PointPresenter {
       onFormSubmit: this.#handleFormSubmit,
       onBtnDeleteClick: this.#handleBtnDeleteClick,
       onBtnRollupClick: this.#handleBtnRollupClick,
+      formMode: FormMode.EDITING,
     });
 
     if (prevPointView === null || prevPointEdit === null) {
@@ -72,11 +68,11 @@ export default class PointPresenter {
       return;
     }
 
-    if (this.#mode === Mode.VIEWING) {
+    if (this.#mode === FormMode.VIEWING) {
       replace(this.#pointView, prevPointView);
     }
 
-    if (this.#mode === Mode.EDITING) {
+    if (this.#mode !== FormMode.VIEWING) {
       replace(this.#pointEdit, prevPointEdit);
     }
 
@@ -90,22 +86,19 @@ export default class PointPresenter {
   }
 
   resetView() {
-    if (this.#mode !== Mode.VIEWING) {
+    if (this.#mode !== FormMode.VIEWING) {
       this.#pointEdit.reset(this.#point);
       this.#toView();
     }
   }
 
   #getPointInfo(point) {
-    /*
-    if (!point.id) {
-      point.id = this.#items.size + 1;
-    }
-    */
+    const desitation = this.#destinationListModel.getItemById(
+      point.destination,
+    );
     return {
       eventTypeName: this.#eventTypeListModel.getItemById(point.type).name,
-      destinationName: this.#destinationListModel.getItemById(point.destination)
-        .name,
+      destinationName: desitation ? desitation.name : '',
       offers: point.offers.map((id) => ({
         title: this.#offerListModel.items[point.type][id].title,
         price: this.#offerListModel.items[point.type][id].price,
@@ -117,13 +110,13 @@ export default class PointPresenter {
     this.#handleModeChange();
     replace(this.#pointEdit, this.#pointView);
     document.addEventListener('keydown', this.#escKeyDownHandler);
-    this.#mode = Mode.EDITING;
+    this.#mode = FormMode.EDITING;
   }
 
   #toView() {
     replace(this.#pointView, this.#pointEdit);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
-    this.#mode = Mode.VIEWING;
+    this.#mode = FormMode.VIEWING;
   }
 
   #escKeyDownHandler = (evt) => {
@@ -141,7 +134,7 @@ export default class PointPresenter {
   };
 
   #handleBtnRollupClick = () => {
-    if (this.#mode === Mode.VIEWING) {
+    if (this.#mode === FormMode.VIEWING) {
       this.#toEdit();
     } else {
       this.resetView();
@@ -163,11 +156,17 @@ export default class PointPresenter {
     )
       updateType = UpdateType.MINOR;
     // Изменения повлият на сводную иформацию о маршруте
-    else if (this.#point.destination !== point.destination)
+    else if (
+      this.#point.destination !== point.destination ||
+      this.#point.price !== point.price ||
+      this.#offerListModel.getOffersCost(
+        this.#point.offers,
+        this.#point.type,
+      ) !== this.#offerListModel.getOffersCost(point.offers, point.type)
+    )
       updateType = UpdateType.SMALL;
     // Изменения влияют только на одну строку в списке
     else updateType = UpdateType.PATCH;
-
     this.#handleDataChange(ActionType.UPDATE, updateType, point);
     this.#toView();
   };

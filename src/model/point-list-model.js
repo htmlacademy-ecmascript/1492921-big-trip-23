@@ -45,9 +45,6 @@ export default class PointListModel extends Observable {
       return;
     }
     this.#items.set(point.id, point);
-    console.log('UPDATE');
-    console.log(point);
-    console.log(updateType);
     this._notify(updateType, point);
   }
 
@@ -75,6 +72,7 @@ export default class PointListModel extends Observable {
     ) {
       destinationsDistinct.push(lastDestionation);
     }
+    //console.log(points);
     return {
       destinations: destinationsDistinct,
       dateFrom: pointsSortied[0].dateFrom,
@@ -83,11 +81,7 @@ export default class PointListModel extends Observable {
         (total, point) =>
           total +
           point.price +
-          point.offers.reduce(
-            (cost, offerId) =>
-              cost + this.#offerList.items[point.type][offerId].price,
-            0,
-          ),
+          this.#offerList.getOffersCost(point.offers, point.type),
         0,
       ),
     };

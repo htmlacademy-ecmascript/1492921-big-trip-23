@@ -2,6 +2,7 @@ import {
   DEFAULT_FILTER,
   DEFAULT_SORTING,
   FilterItems,
+  IsNotify,
   SortingItems,
   UpdateType,
 } from '@src/const.js';
@@ -10,6 +11,7 @@ import SortingView from '@view/sorting-view.js';
 import PointListView from '@view/point-list-view.js';
 import MessageView from '@view/message-view.js';
 import PointPresenter from '@presenter/point-presenter.js';
+import NewPointPresenter from '@presenter/new-point-presenter.js';
 import { getFilteredPoints } from '@model/filter-model.js';
 import PointListModel from '@model/point-list-model.js';
 export default class PointListPresenter {
@@ -25,6 +27,8 @@ export default class PointListPresenter {
   #messageView = null;
 
   #pointPresenters = new Map();
+  #newPointPresenter = null;
+  #handleNewPointDestroy = null;
 
   #currentSorting = DEFAULT_SORTING.id;
   #activeFilter = DEFAULT_FILTER.id;
@@ -36,6 +40,7 @@ export default class PointListPresenter {
     destinationListModel,
     offerListModel,
     filterModel,
+    onNewPointDestroy,
   }) {
     this.#container = container;
     this.#pointListModel = pointListModel;
@@ -43,6 +48,8 @@ export default class PointListPresenter {
     this.#destinationListModel = destinationListModel;
     this.#offerListModel = offerListModel;
     this.#filterModel = filterModel;
+
+    this.#handleNewPointDestroy = onNewPointDestroy;
 
     this.#pointListModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -59,6 +66,22 @@ export default class PointListPresenter {
 
   init() {
     this.#refreshPoints();
+  }
+
+  insertPoint() {
+    //this.#currentSortType = SortType.DEFAULT;
+    //this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.ALL);
+    this.#handleModeChange();
+    this.#newPointPresenter = new NewPointPresenter({
+      container: this.#pointListView.element,
+      eventTypeListModel: this.#eventTypeListModel,
+      destinationListModel: this.#destinationListModel,
+      offerListModel: this.#offerListModel,
+      onDataChange: this.#handleInsertPoints,
+      onDestroy: this.#handleNewPointDestroy,
+    });
+    this.#newPointPresenter.init();
+    //this.#pointPresenters.set(point.id, this.#newPointPresenter);
   }
 
   #refreshPoints() {
@@ -86,6 +109,9 @@ export default class PointListPresenter {
   }
 
   #clearPoints() {
+    if (this.#newPointPresenter) {
+      this.#newPointPresenter.destroy();
+    }
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
   }
@@ -111,7 +137,7 @@ export default class PointListPresenter {
       destinationListModel: this.#destinationListModel,
       offerListModel: this.#offerListModel,
       currentSorting: this.#currentSorting,
-      onDataChange: this.#handleViewAction,
+      onDataChange: this.#handleUpdatePoints,
       onModeChange: this.#handleModeChange,
     });
     pointPresenter.init(point);
@@ -126,31 +152,24 @@ export default class PointListPresenter {
   }
 
   #handleModeChange = () => {
+    if (this.#newPointPresenter) {
+      this.#newPointPresenter.destroy();
+    }
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  /*
-  #handlePointChange = (updatedPoint) => {
-    this.#updatePoint(this.#shownPoints, updatedPoint);
-    this.#updatePoint(this.#sourcedPoints, updatedPoint);
-    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
-  };
-*/
-
   #handleSortingChange = (sortingId) => {
-    /*
-    if (this.#currentSortting === sortingId) {
-      return;
-    }
-    */
     this.#currentSorting = sortingId;
     this.#refreshPoints();
-    //this.#clearBoard({resetRenderedTaskCount: true});
-    //this.#renderBoard();
   };
 
-  #handleViewAction = (actionType, updateType, point) => {
+  #handleUpdatePoints = (actionType, updateType, point) => {
     this.#pointListModel.updateItems(actionType, updateType, point);
+  };
+
+  #handleInsertPoints = (actionType, updateType, point) => {
+    this.#filterModel.setFilter(updateType, DEFAULT_FILTER.id, IsNotify.NO);
+    this.#handleUpdatePoints(actionType, updateType, point);
   };
 
   #handleModelEvent = (updateType, data) => {

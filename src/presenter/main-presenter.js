@@ -1,5 +1,5 @@
 import { remove, render, RenderPosition } from '@framework/render.js';
-import { UpdateType } from '@src/const.js';
+import { FormMode, HtmlClasses, UpdateType } from '@src/const.js';
 
 import EventTypeListModel from '@model/event-type-list-model.js';
 import DestinationListModel from '@model/destination-list-model.js';
@@ -27,6 +27,7 @@ export default class MainPresenter {
   #filterModel = null;
 
   #tripInfoView = null;
+  #btnNewEvent = null;
 
   constructor({ mainContainer, filtersContainer, tripEventsContainer }) {
     this.#mainContainer = mainContainer;
@@ -41,6 +42,11 @@ export default class MainPresenter {
       this.#offerListModel,
     );
     this.#filterModel = new FilterModel();
+
+    this.#btnNewEvent = mainContainer.querySelector(
+      `.${HtmlClasses.INSERT_BUTTON}`,
+    );
+    this.#btnNewEvent.addEventListener('click', this.#btnNewEventClickHandler);
 
     this.#pointListModel.addObserver(this.#handleModelEvent);
   }
@@ -84,6 +90,7 @@ export default class MainPresenter {
       destinationListModel: this.#destinationListModel,
       offerListModel: this.#offerListModel,
       filterModel: this.#filterModel,
+      onNewPointDestroy: this.#handleNewPointFormClose,
     });
     this.#pointListPresenter.init();
   }
@@ -93,5 +100,14 @@ export default class MainPresenter {
       return;
     }
     this.#refreshTripInfo();
+  };
+
+  #handleNewPointFormClose = () => {
+    this.#btnNewEvent.disabled = false;
+  };
+
+  #btnNewEventClickHandler = () => {
+    this.#pointListPresenter.insertPoint();
+    this.#btnNewEvent.disabled = true;
   };
 }

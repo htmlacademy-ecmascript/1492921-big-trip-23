@@ -18,10 +18,21 @@ export default class OfferListModel {
     return this.#items;
   }
 
-  getOffersForEventType(eventType) {
+  getOffersForEventType = (eventType) => {
     if (this.#items && this.#items[eventType]) {
       return Object.values(this.#items[eventType]);
     }
     return [];
-  }
+  };
+
+  getOffersCost = (offers, type) => {
+    const offersType = this.#items[type];
+    if (!offersType) {
+      return 0;
+    }
+    return offers.reduce(
+      (cost, offerId) => cost + offersType[offerId].price,
+      0,
+    );
+  };
 }

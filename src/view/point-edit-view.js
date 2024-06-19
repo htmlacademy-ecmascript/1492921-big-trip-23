@@ -1,8 +1,19 @@
-import { BLANK_POINT, Folders, HtmlClasses } from '@src/const.js';
+import {
+  BLANK_POINT,
+  CaptionBtnDelete,
+  Folders,
+  FormMode,
+  HtmlClasses,
+} from '@src/const.js';
 import { formatDateTime } from '@utils/datetime.js';
 import AbstractStatefulView from '@framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+
+const Input = {
+  DATE_FROM: 'event-start-time',
+  DATE_TO: 'event-end-time',
+};
 
 const eventTypeItemTemplate = (item) => `
   <div class="event__type-item">
@@ -95,6 +106,7 @@ const editPointTemplate = (
   eventTypeList,
   destinationList,
   offerList,
+  mode,
 ) => {
   const { type, destination, dateFrom, dateTo, price, offers } = state;
   return `
@@ -115,7 +127,7 @@ const editPointTemplate = (
             ${eventTypeList[type].name}
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination"
-            value="${destinationList[destination].name}" list="destination-list-1" required
+            value="${destinationList[destination] ? destinationList[destination].name : ''}" list="destination-list-1" required
           >
           <datalist id="destination-list-1">
             ${Object.values(destinationList)
@@ -126,10 +138,25 @@ const editPointTemplate = (
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDateTime(dateFrom)}">
+          <input
+            class="event__input  event__input--time"
+            id="event-start-time-1"
+            type="text"
+            name="event-start-time"
+            value="${formatDateTime(dateFrom)}"
+            autocomplete="off"
+            required
+          >
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDateTime(dateTo)}">
+          <input
+            class="event__input  event__input--time"
+            id="event-end-time-1"
+            type="text"
+            name="event-end-time"
+            value="${formatDateTime(dateTo)}"
+            autocomplete="off"
+            required>
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -137,14 +164,19 @@ const editPointTemplate = (
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+          <input class="event__input  event__input--price" id="event-price-1" type="text"
+            name="event-price" value="${price}" title="Требуется целое положительное число" pattern="^[1-9][0-9]+$" required>
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit"}>Save</button>
-        <button class="event__reset-btn" type="reset">Delete</button>
-        <button class="event__rollup-btn" type="button">
-          <span class="visually-hidden">Open event</span>
-        </button>
+        <button class="event__reset-btn" type="reset">${CaptionBtnDelete[mode]}</button>
+        ${
+          mode === FormMode.INSERTING
+            ? ''
+            : `<button class="event__rollup-btn" type="button">
+             <span class="visually-hidden">Open event</span>
+           </button>`
+        }
       </header>
 
       <section class="event__details">
@@ -161,8 +193,9 @@ export default class PointEditView extends AbstractStatefulView {
   #offerList = null;
   #handleFormSubmit = null;
   #handleBtnDeleteClick = null;
-  #handleBtnRollupClick = null;
+  #handleFormClose = null;
   #dates = {};
+  #mode = null;
 
   constructor({
     point = BLANK_POINT,
@@ -172,6 +205,7 @@ export default class PointEditView extends AbstractStatefulView {
     onFormSubmit,
     onBtnDeleteClick,
     onBtnRollupClick,
+    formMode = FormMode.EDITING,
   }) {
     super();
     this.#eventTypeList = eventTypeList;
@@ -180,7 +214,8 @@ export default class PointEditView extends AbstractStatefulView {
     this._setState(PointEditView.parsePointToState(point));
     this.#handleFormSubmit = onFormSubmit;
     this.#handleBtnDeleteClick = onBtnDeleteClick;
-    this.#handleBtnRollupClick = onBtnRollupClick;
+    this.#handleFormClose = onBtnRollupClick;
+    this.#mode = formMode;
     this._restoreHandlers();
   }
 
@@ -190,6 +225,7 @@ export default class PointEditView extends AbstractStatefulView {
       this.#eventTypeList,
       this.#destinationList,
       this.#offerList,
+      this.#mode,
     );
   }
 
@@ -200,9 +236,11 @@ export default class PointEditView extends AbstractStatefulView {
     this.element
       .querySelector(`.${HtmlClasses.DELETE_BUTTON}`)
       .addEventListener('click', this.#btnDeleteClickHandler);
-    this.element
-      .querySelector(`.${HtmlClasses.ROLLUP_BUTTON}`)
-      .addEventListener('click', this.#btnRollupClickHandler);
+    if (this.#mode === FormMode.EDITING) {
+      this.element
+        .querySelector(`.${HtmlClasses.ROLLUP_BUTTON}`)
+        .addEventListener('click', this.#btnRollupClickHandler);
+    }
     this.element
       .querySelector(`.${HtmlClasses.EVENT_TYPE}`)
       .addEventListener('change', this.#eventTypeChangeHandler);
@@ -241,11 +279,10 @@ export default class PointEditView extends AbstractStatefulView {
       enableTime: true,
       // eslint-disable-next-line camelcase
       time_24hr: true,
+      maxDate: element.name === Input.DATE_FROM ? this._state.dateTo : null,
+      minDate: element.name === Input.DATE_TO ? this._state.dateFrom : null,
       dateFormat: 'd/m/y H:i',
-      defaultDate:
-        element.name === 'event-start-time'
-          ? this._state.dateFrom
-          : this._state.dateTo,
+      allowInput: true,
       onChange: this.#timeChangeHandler,
     });
   }
@@ -262,7 +299,7 @@ export default class PointEditView extends AbstractStatefulView {
 
   #btnRollupClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleBtnRollupClick();
+    this.#handleFormClose();
   };
 
   #eventTypeChangeHandler = (evt) => {
@@ -283,15 +320,18 @@ export default class PointEditView extends AbstractStatefulView {
   };
 
   #timeChangeHandler = ([dateTime], dateStr, instance) => {
-    this._setState({
-      [instance.element.name === 'event-start-time' ? 'dateFrom' : 'dateTo']:
-        dateTime,
-    });
+    if (instance.element.name === Input.DATE_FROM) {
+      this._setState({ dateFrom: dateTime });
+      this.#dates[Input.DATE_TO].set('minDate', dateTime);
+      return;
+    }
+    this._setState({ dateTo: dateTime });
+    this.#dates[Input.DATE_FROM].set('maxDate', dateTime);
   };
 
   #priceChangeHandler = (evt) => {
     evt.preventDefault();
-    this._setState({ price: evt.target.value });
+    this._setState({ price: Number(evt.target.value) });
   };
 
   #offerChangeHandler = (evt) => {
