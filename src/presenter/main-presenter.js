@@ -1,5 +1,5 @@
 import { remove, render, RenderPosition } from '@framework/render.js';
-import { FormMode, HtmlClasses, UpdateType } from '@src/const.js';
+import { HtmlClasses, UpdateType } from '@src/const.js';
 
 import EventTypeListModel from '@model/event-type-list-model.js';
 import DestinationListModel from '@model/destination-list-model.js';
@@ -95,7 +95,7 @@ export default class MainPresenter {
     this.#pointListPresenter.init();
   }
 
-  #handleModelEvent = (updateType, data) => {
+  #handleModelEvent = (updateType) => {
     if (updateType === UpdateType.PATCH) {
       return;
     }
