@@ -16,17 +16,18 @@ const tripInfoTemplate = ({ trip, period, cost }) => `
 export default class TripInfoView extends AbstractView {
   #tripInfo = null;
 
-  constructor({ points, dateFrom, dateTo, cost }) {
+  constructor({ destinations, dateFrom, dateTo, cost }) {
     super();
     const dayMonthFom = formatDateTime(dateFrom, DateTimeFormats.DAY_MONTH);
     const dayMonthTo = formatDateTime(dateTo, DateTimeFormats.DAY_MONTH);
     const [startDay, startMonth] = dayMonthFom.split(' ');
     const [endDay, endMonth] = dayMonthTo.split(' ');
     const trip =
-      points.length > MAX_DESTINATION_IN_TRIP_INFO
-        ? `${points[0]} &mdash; &hellip; &mdash; ${points[points.length - 1]}`
-        : points.join(' &mdash; ');
+      destinations.length > MAX_DESTINATION_IN_TRIP_INFO
+        ? `${destinations[0]} &mdash; &hellip; &mdash; ${destinations[destinations.length - 1]}`
+        : destinations.join(' &mdash; ');
     const period = `${startDay}${startMonth === endMonth ? '' : ` ${startMonth}`} &mdash; ${endDay} ${endMonth}`;
+    //console.log(`cost = ${cost}`);
     this.#tripInfo = {
       trip,
       period,

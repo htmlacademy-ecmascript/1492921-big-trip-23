@@ -17,23 +17,18 @@ const offersTemplate = (items) => `
   </ul>
 `;
 
-const pointTemplate = ({
-  type,
-  dateFrom,
-  dateTo,
-  price,
-  typeName,
-  destinationName,
-  offers,
-  isFavorite,
-}) => `
+const pointTemplate = (point, pointInfo) => {
+  const { type, dateFrom, dateTo, price, isFavorite } = point;
+  const { eventTypeName, destinationName, offers } = pointInfo;
+
+  return `
   <li class="trip-events__item">
     <div class="event">
     <time class="event__date" datetime="${formatDateTime(dateFrom, DateTimeFormats.DATE_ISO)}">${formatDateTime(dateFrom, DateTimeFormats.MONTH_DAY)}</time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="${Folders.ICON}${type}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${typeName} ${destinationName}</h3>
+      <h3 class="event__title">${eventTypeName} ${destinationName}</h3>
       <div class="event__schedule">
         <p class="event__time">
         <time class="event__start-time" datetime="${formatDateTime(dateFrom, DateTimeFormats.DATE_TIME_ISO)}">${formatDateTime(dateFrom, DateTimeFormats.TIME)}</time>
@@ -57,14 +52,17 @@ const pointTemplate = ({
       </button>
     </div>
   </li>`;
+};
 export default class PointView extends AbstractView {
   #point = null;
+  #pointInfo = null;
   #handleBtnRollupClick = null;
   #handleBtnFavoriteClick = null;
 
-  constructor({ point, onBtnRollupClick, onBtnFavoriteClick }) {
+  constructor({ point, pointInfo, onBtnRollupClick, onBtnFavoriteClick }) {
     super();
     this.#point = point;
+    this.#pointInfo = pointInfo;
     this.#handleBtnRollupClick = onBtnRollupClick;
     this.#handleBtnFavoriteClick = onBtnFavoriteClick;
 
@@ -78,7 +76,7 @@ export default class PointView extends AbstractView {
   }
 
   get template() {
-    return pointTemplate(this.#point);
+    return pointTemplate(this.#point, this.#pointInfo);
   }
 
   #btnRollupClickHandler = (evt) => {

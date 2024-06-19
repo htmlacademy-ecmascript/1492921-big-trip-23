@@ -1,70 +1,55 @@
-import { isAfterNow, isBeforeNow } from '@utils/datetime.js';
-import {
-  FilterItems,
-  IncludeBoundaries,
-  INIT_FILTER_ITEM,
-} from '@src/const.js';
-import { render } from '@framework/render.js';
+import { remove, render, replace } from '@framework/render.js';
+import { FilterItems, UpdateType } from '@src/const.js';
 import FiltersView from '@view/filters-view.js';
+import { getFilteredPoints } from '@model/filter-model.js';
 
-const filter = {
-  [FilterItems.EVERYTHING.id]: (points) => points,
-  [FilterItems.FUTURE.id]: (points) =>
-    points.filter((point) => isAfterNow(point.dateTo)),
-  [FilterItems.PRESENT.id]: (points) =>
-    points.filter(
-      (point) =>
-        isAfterNow(point.dateFrom, IncludeBoundaries.YES) &&
-        isBeforeNow(point.dateTo, IncludeBoundaries.YES),
-    ),
-  [FilterItems.PAST.id]: (points) =>
-    points.filter((point) => isBeforeNow(point.dateTo)),
-};
 export default class FilterPresenter {
-  #filtersContainer = null;
-  #filterPoints = {};
-  #filters = [];
+  #container = null;
+  #filterModel = null;
+  #pointListModel = null;
+
   #filterView = null;
-  #handleRefresh = null;
-  #handleEmptyFilter = null;
 
-  constructor({ points, container, onRefresh, onEmptyFilter }) {
-    this.#filtersContainer = container;
-    this.#handleRefresh = onRefresh;
-    this.#handleEmptyFilter = onEmptyFilter;
-    this.#filters = Object.entries(filter).map(([id, filterPoints]) => {
-      this.#filterPoints[id] = filterPoints(points);
-      return {
-        id: id,
-        name: FilterItems[id.toUpperCase()].name,
-        count: this.#filterPoints[id].length,
-      };
-    });
+  constructor({ container, filterModel, pointListModel }) {
+    this.#container = container;
+    this.#pointListModel = pointListModel;
+    this.#filterModel = filterModel;
+
+    this.#pointListModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  // Инициализация презентера
+  get filters() {
+    return Object.values(FilterItems).map((item) => ({
+      id: item.id,
+      name: item.name,
+      count: getFilteredPoints(this.#pointListModel.points, item.id).length,
+    }));
+  }
+
   init() {
-    this.#renderFiltres();
-  }
+    const prevFilterView = this.#filterView;
 
-  // Фиьтрация данных
-  setFilter = (filterId) => {
-    //this.#filterView.setActiveFilter(filterName);
-    if (this.#filterPoints[filterId].length === 0) {
-      this.#handleEmptyFilter(FilterItems[filterId.toUpperCase()].emptyMessage);
+    this.#filterView = new FiltersView({
+      filters: this.filters,
+      activeFilter: this.#filterModel.activeFilter,
+      onFilterChange: this.#handleFilterChange,
+    });
+
+    if (prevFilterView === null) {
+      render(this.#filterView, this.#container);
       return;
     }
-    this.#handleEmptyFilter(null);
-    this.#handleRefresh(this.#filterPoints[filterId]);
+
+    replace(this.#filterView, prevFilterView);
+    remove(prevFilterView);
+  }
+
+  #handleModelEvent = () => {
+    this.init();
   };
 
-  // Рендеринг фильтров
-  #renderFiltres() {
-    this.#filterView = new FiltersView({
-      filters: this.#filters,
-      onFilterChange: this.setFilter,
-    });
-    render(this.#filterView, this.#filtersContainer);
-    this.#filterView.activeFilter = INIT_FILTER_ITEM.id;
-  }
+  #handleFilterChange = (filterValue) => {
+    this.#filterModel.setFilter(UpdateType.MAJOR, filterValue);
+  };
 }
