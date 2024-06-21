@@ -5,9 +5,7 @@ const sortItemTemplate = (item, currentSorting) => {
   return `
     <div class="trip-sort__item  trip-sort__item--${id}">
       <input id="sort-${id}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" data-id="${id}"
-        value="sort-${id}" ${!isCanSort ? 'disabled' : ''} ${
-    id === currentSorting ? 'checked' : ''
-  }
+        value="sort-${id}" ${!isCanSort ? 'disabled' : ''} ${id === currentSorting ? 'checked' : ''}
       >
       <label class="trip-sort__btn" for="sort-${id}">${name}</label>
     </div>
@@ -16,9 +14,7 @@ const sortItemTemplate = (item, currentSorting) => {
 
 const sortingTemplate = (items, currentSorting) => `
   <form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-    ${Object.values(items)
-      .map((item) => sortItemTemplate(item, currentSorting))
-      .join('')}
+    ${Object.values(items).map((item) => sortItemTemplate(item, currentSorting)).join('')}
   </form>
 `;
 export default class SortingView extends AbstractView {
