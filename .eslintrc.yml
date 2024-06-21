@@ -9,9 +9,6 @@ env:
 extends:
   - 'htmlacademy/vanilla'
 
-plugins:
-  - import
-
 rules:
   sort-imports:
     - error
