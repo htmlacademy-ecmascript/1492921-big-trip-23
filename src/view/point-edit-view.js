@@ -37,8 +37,7 @@ const offerTemplate = (item, checked) => {
   return `
   <div class="event__offer-selector">
     <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}-1" type="checkbox"
-      data-id="${id}" name="event-offer-${id}" ${checked ? 'checked' : ''}
-    >
+      data-id="${id}" name="event-offer-${id}" ${checked ? 'checked' : ''}>
     <label class="event__offer-label" for="event-offer-${id}-1">
       <span class="event__offer-title">${title}</span>
       &plus;&euro;&nbsp;

@@ -1,4 +1,3 @@
-import { UpdateType } from '../const';
 export default class OfferListModel {
   #tripApiService = null;
   #offers = [];
