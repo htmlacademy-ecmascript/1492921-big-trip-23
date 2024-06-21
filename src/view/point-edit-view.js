@@ -25,9 +25,9 @@ const eventTypeListTemplate = (items) => `
   <div class="event__type-list">
     <fieldset class="event__type-group">
       <legend class="visually-hidden">Event type</legend>
-        ${Object.values(items)
-          .map((item) => eventTypeItemTemplate(item))
-          .join('')}
+      ${Object.values(items)
+        .map((item) => eventTypeItemTemplate(item))
+        .join('')}
     </fieldset>
   </div>
 `;
@@ -58,15 +58,15 @@ const offersTemplate = (items, itemsChecked) => `
         .map((item) =>
           offerTemplate(
             item,
-            itemsChecked.find((element) => element === item.id) !== undefined,
-          ),
+            itemsChecked.find((element) => element === item.id) !== undefined
+          )
         )
         .join('')}
     </div>
-  </section>
-`
+  </section>`
       : ''
-  }`;
+  }
+  `;
 
 const descriptionTemplate = (destinationInfo) => {
   if (!destinationInfo) {
@@ -84,7 +84,7 @@ const descriptionTemplate = (destinationInfo) => {
         <div class="event__photos-tape">
           ${pictures.map(
             (picture) =>
-              `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`,
+              `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`
           )}
         </div>
       </div>`;
@@ -105,7 +105,7 @@ const editPointTemplate = (
   eventTypeList,
   destinationList,
   offerList,
-  mode,
+  mode
 ) => {
   const {
     type,
@@ -129,7 +129,9 @@ const editPointTemplate = (
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="${Folders.ICON}${type}.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="${
+              Folders.ICON
+            }${type}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
           ${eventTypeListTemplate(eventTypeList)}
@@ -140,7 +142,11 @@ const editPointTemplate = (
             ${eventTypeList[type].name}
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination"
-            value="${destinationList[destination] ? destinationList[destination].name : ''}" list="destination-list-1" required
+            value="${
+              destinationList[destination]
+                ? destinationList[destination].name
+                : ''
+            }" list="destination-list-1" required
           >
           <datalist id="destination-list-1">
             ${Object.values(destinationList)
@@ -186,14 +192,20 @@ const editPointTemplate = (
         ${
           mode === FormMode.INSERTING
             ? ''
-            : `<button class="event__rollup-btn" type="button">
-             <span class="visually-hidden">Open event</span>
-           </button>`
+            : `
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>
+        `
         }
       </header>
 
       <section class="event__details">
-        ${offerList[type] ? offersTemplate(Object.values(offerList[type]), offers) : ''}
+        ${
+          offerList[type]
+            ? offersTemplate(Object.values(offerList[type]), offers)
+            : ''
+        }
         ${descriptionTemplate(destinationList[destination])}
       </section>
     </form>
@@ -238,7 +250,7 @@ export default class PointEditView extends AbstractStatefulView {
       this.#eventTypeList,
       this.#destinationList,
       this.#offerList,
-      this.#mode,
+      this.#mode
     );
   }
 
@@ -271,7 +283,7 @@ export default class PointEditView extends AbstractStatefulView {
     this.element
       .querySelectorAll(`.${HtmlClasses.EVENT_OFFER}`)
       .forEach((element) =>
-        element.addEventListener('change', this.#offerChangeHandler),
+        element.addEventListener('change', this.#offerChangeHandler)
       );
   }
 
@@ -327,7 +339,7 @@ export default class PointEditView extends AbstractStatefulView {
     evt.preventDefault();
     this.updateElement({
       destination: Object.keys(this.#destinationList).find(
-        (key) => this.#destinationList[key].name === evt.target.value,
+        (key) => this.#destinationList[key].name === evt.target.value
       ),
     });
   };
@@ -358,7 +370,7 @@ export default class PointEditView extends AbstractStatefulView {
     } else {
       this._setState({
         offers: this._state.offers.filter(
-          (item) => evt.target.dataset.id !== item,
+          (item) => evt.target.dataset.id !== item
         ),
       });
     }

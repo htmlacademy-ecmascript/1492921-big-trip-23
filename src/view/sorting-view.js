@@ -5,7 +5,9 @@ const sortItemTemplate = (item, currentSorting) => {
   return `
     <div class="trip-sort__item  trip-sort__item--${id}">
       <input id="sort-${id}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" data-id="${id}"
-        value="sort-${id}" ${!isCanSort ? 'disabled' : ''} ${id === currentSorting ? 'checked' : ''}
+        value="sort-${id}" ${!isCanSort ? 'disabled' : ''} ${
+    id === currentSorting ? 'checked' : ''
+  }
       >
       <label class="trip-sort__btn" for="sort-${id}">${name}</label>
     </div>
