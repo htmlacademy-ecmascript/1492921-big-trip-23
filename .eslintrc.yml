@@ -8,7 +8,6 @@ env:
 
 extends:
   - 'htmlacademy/vanilla'
-  - 'prettier'
 
 plugins:
   - import
