@@ -1,12 +1,11 @@
-import { mockDestinations } from '../mock/mock-data.js';
-import { converArrayToObject } from '@utils/common.js';
-
+import { convertArrayToObject } from '@utils/common.js';
 export default class DestinationListModel {
-  #destinations = mockDestinations;
+  #tripApiService = null;
+  #destinations = [];
   #items = {};
 
-  constructor() {
-    this.#items = converArrayToObject(this.#destinations);
+  constructor(tripApiService) {
+    this.#tripApiService = tripApiService;
   }
 
   get items() {
@@ -18,6 +17,15 @@ export default class DestinationListModel {
       return Object.values(this.#items);
     }
     return [];
+  }
+
+  async init() {
+    try {
+      this.#destinations = await this.#tripApiService.getDestinations();
+    } catch (error) {
+      throw new Error(error.message);
+    }
+    this.#items = convertArrayToObject(this.#destinations);
   }
 
   getItemByName(name) {

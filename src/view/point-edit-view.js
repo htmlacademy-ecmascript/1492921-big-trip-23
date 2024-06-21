@@ -1,6 +1,6 @@
 import {
   BLANK_POINT,
-  CaptionBtnDelete,
+  ButtonTypes,
   Folders,
   FormMode,
   HtmlClasses,
@@ -50,7 +50,7 @@ const offerTemplate = (item, checked) => {
 
 const offersTemplate = (items, itemsChecked) => `
   ${
-    items
+    items && items.length > 0
       ? `
   <section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
@@ -108,7 +108,21 @@ const editPointTemplate = (
   offerList,
   mode,
 ) => {
-  const { type, destination, dateFrom, dateTo, price, offers } = state;
+  const {
+    type,
+    destination,
+    dateFrom,
+    dateTo,
+    price,
+    offers,
+    isSaving,
+    isDeleting,
+  } = state;
+  const saveCaption = isSaving ? ButtonTypes.SAVING : ButtonTypes.SAVE;
+  const deleteCaption = isDeleting ? ButtonTypes.DELETING : ButtonTypes.DELETE;
+  const resetCaption =
+    mode === FormMode.INSERTING ? ButtonTypes.CANCEL : deleteCaption;
+
   return `
   <li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
@@ -165,11 +179,11 @@ const editPointTemplate = (
             &euro;
           </label>
           <input class="event__input  event__input--price" id="event-price-1" type="text"
-            name="event-price" value="${price}" title="Требуется целое положительное число" pattern="^[1-9][0-9]+$" required>
+            name="event-price" value="${price}" title="Требуется целое положительное число" pattern="[0-9]+$" required>
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit"}>Save</button>
-        <button class="event__reset-btn" type="reset">${CaptionBtnDelete[mode]}</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit"}>${saveCaption}</button>
+        <button class="event__reset-btn" type="reset">${resetCaption}</button>
         ${
           mode === FormMode.INSERTING
             ? ''
@@ -352,10 +366,16 @@ export default class PointEditView extends AbstractStatefulView {
   };
 
   static parsePointToState(point) {
-    return { ...point };
+    return {
+      ...point,
+      isSaving: false,
+      isDeleting: false,
+    };
   }
 
   static parseStateToPoint(state) {
+    delete state.isSaving;
+    delete state.isDeleting;
     return state;
   }
 }

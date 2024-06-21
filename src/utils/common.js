@@ -8,20 +8,20 @@ const getItem = (items, keyValue, keyName = 'id') => {
   return null;
 };
 
-const converArrayToObject = (source, keyName = 'id') => {
+const convertArrayToObject = (sourceItems, keyName = 'id') => {
   const target = {};
-  source.forEach((element) => {
+  sourceItems.forEach((element) => {
     target[element[keyName]] = element;
   });
   return target;
 };
 
-const converArrayToMap = (source, keyName = 'id') => {
+const convertArrayToMap = (sourceItems, keyName = 'id') => {
   const target = new Map();
-  source.forEach((element) => {
+  sourceItems.forEach((element) => {
     target.set(element[keyName], element);
   });
   return target;
 };
 
-export { converArrayToMap, converArrayToObject, getItem };
+export { convertArrayToMap, convertArrayToObject, getItem };

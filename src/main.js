@@ -1,4 +1,4 @@
-import MainPresenter from './presenter/main-presenter.js';
+import MainPresenter from '@presenter/main-presenter.js';
 
 const mainElement = document.querySelector('.trip-main');
 const filtersElement = mainElement.querySelector('.trip-controls__filters');

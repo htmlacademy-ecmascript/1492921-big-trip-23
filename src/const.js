@@ -18,6 +18,7 @@ const BLANK_POINT = {
   dateTo: null,
   price: 0,
   offers: [],
+  isFavorite: false,
 };
 
 const HtmlClasses = {
@@ -77,6 +78,14 @@ const IsNotify = {
   NO: false,
 };
 
+const ButtonTypes = {
+  SAVE: 'Save',
+  SAVING: 'Saving...',
+  DELETE: 'Delete',
+  DELETING: 'Deleting...',
+  CANCEL: 'Cancel',
+};
+
 const ActionType = {
   INSERT: 'INSERT',
   UPDATE: 'UPDATE',
@@ -88,6 +97,7 @@ const UpdateType = {
   SMALL: 'SMALL',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  ERROR: 'ERROR',
 };
 
 const FormMode = {
@@ -96,14 +106,21 @@ const FormMode = {
   VIEWING: 'VIEWING',
 };
 
-const CaptionBtnDelete = {
-  INSERTING: 'Cancel',
-  EDITING: 'Delete',
+const MessageLoading = {
+  LOADING: 'Loading ...',
+  ERROR: 'Failed to load latest route information',
+};
+
+const AUTHORIZATION = 'Basic ghb44  dtnBPJvcrf';
+const END_POINT = 'https://23.objects.htmlacademy.pro/big-trip';
+
+const LimitBlocking = {
+  LOWER: 350,
+  UPPER: 1000,
 };
 
 export {
   BLANK_POINT,
-  //BLANK_POINT_ID,
   DateTimeFormats,
   Folders,
   HtmlClasses,
@@ -116,6 +133,10 @@ export {
   ActionType,
   UpdateType,
   FormMode,
-  CaptionBtnDelete,
+  ButtonTypes,
   IsNotify,
+  LimitBlocking,
+  MessageLoading,
+  AUTHORIZATION,
+  END_POINT,
 };

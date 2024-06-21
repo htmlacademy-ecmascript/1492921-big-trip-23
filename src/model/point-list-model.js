@@ -1,7 +1,12 @@
-import { randomPoints } from '../mock/mock-data.js';
 import Observable from '@framework/observable.js';
 import dayjs from 'dayjs';
-import { ActionType, DEFAULT_SORTING, SortingItems } from '@src/const.js';
+import {
+  ActionType,
+  DEFAULT_SORTING,
+  SortingItems,
+  UpdateType,
+} from '@src/const.js';
+import TripApiService from '@src/trip-api-service';
 
 const SortingFunction = {
   [SortingItems.DAY.id]: (pointA, pointB) =>
@@ -13,18 +18,17 @@ const SortingFunction = {
   [SortingItems.PRICE.id]: (pointA, pointB) => pointB.price - pointA.price,
 };
 export default class PointListModel extends Observable {
-  #points = randomPoints;
+  #tripApiService = null;
+  #points = [];
   #items = new Map();
   #destinationList = null;
   #offerList = null;
 
-  constructor(destinationList, offerList) {
+  constructor(tripApiService, destinationList, offerList) {
     super();
+    this.#tripApiService = tripApiService;
     this.#destinationList = destinationList;
     this.#offerList = offerList;
-    this.#points.forEach((element) => {
-      this.#items.set(element.id, element);
-    });
   }
 
   get items() {
@@ -38,14 +42,45 @@ export default class PointListModel extends Observable {
     return null;
   }
 
-  updateItems(actionType, updateType, point) {
+  async init() {
+    try {
+      this.#points = (await this.#tripApiService.getPoints()).map(
+        TripApiService.adaptToClient,
+      );
+    } catch (error) {
+      throw new Error(error.message);
+    }
+
+    this.#points.forEach((element) => {
+      this.#items.set(element.id, element);
+    });
+    this._notify(UpdateType.MAJOR);
+  }
+
+  async updateItems(actionType, updateType, point) {
     if (actionType === ActionType.DELETE) {
-      this.#items.delete(point.id);
-      this._notify(updateType);
+      try {
+        await this.#tripApiService.deletePoint(point);
+        this.#items.delete(point.id);
+        this._notify(updateType, { ...point });
+      } catch (error) {
+        throw new Error(`Delete error: ${error.message}`);
+      }
       return;
     }
-    this.#items.set(point.id, point);
-    this._notify(updateType, point);
+    try {
+      let savedPoint;
+      if (actionType === ActionType.INSERT) {
+        savedPoint = await this.#tripApiService.insertPoint(point);
+      }
+      if (actionType === ActionType.UPDATE) {
+        savedPoint = await this.#tripApiService.updatePoint(point);
+      }
+      this.#items.set(savedPoint.id, savedPoint);
+      this._notify(updateType, savedPoint);
+    } catch (error) {
+      throw new Error(`${actionType} error: ${error.message}`);
+    }
   }
 
   getTripInfo(points = this.points) {
