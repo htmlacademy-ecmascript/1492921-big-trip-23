@@ -92,9 +92,31 @@ export default class PointPresenter {
     }
   }
 
+  setSaving = () => {
+    if (this.#mode === FormMode.EDITING) {
+      this.#pointEdit.updateElement({ isSaving: true, isDeleting: false });
+    }
+  };
+
+  setDeleting = () => {
+    if (this.#mode === FormMode.EDITING) {
+      this.#pointEdit.updateElement({ isDeleting: true, isSaving: false });
+    }
+  };
+
+  setAborting = () => {
+    if (this.#mode === FormMode.VIEWING) {
+      this.#pointView.shake();
+      return;
+    }
+    const resetFormState = () =>
+      this.#pointEdit.updateElement({ isSaving: false, isDeleting: false });
+    this.#pointEdit.shake(resetFormState);
+  };
+
   #getPointInfo(point) {
     const desitation = this.#destinationListModel.getItemById(
-      point.destination,
+      point.destination
     );
     return {
       eventTypeName: this.#eventTypeListModel.getItemById(point.type).name,
@@ -143,32 +165,33 @@ export default class PointPresenter {
 
   #handleFormSubmit = (point) => {
     let updateType;
-    // Поля влияют на фильтрацию, сделать бы MAJOR, но тогда сменится сортировки при переключении фильтров
     if (
+      // Поля влияют на сортировку
       !isDatesEqual(this.#point.dateFrom, point.dateFrom) ||
       !isDatesEqual(this.#point.dateTo, point.dateTo)
-    )
+    ) {
       updateType = UpdateType.MINOR;
-    // Поля влияют на сортировку
-    else if (
+    } else if (
+      // Поля влияют на сортировку
       this.#point.price !== point.price &&
       this.#currentSorting === SortingItems.PRICE.id
-    )
+    ) {
       updateType = UpdateType.MINOR;
-    // Изменения повлият на сводную иформацию о маршруте
-    else if (
+    } else if (
+      // Изменения повлият на сводную иформацию о маршруте
       this.#point.destination !== point.destination ||
       this.#point.price !== point.price ||
       this.#offerListModel.getOffersCost(
         this.#point.offers,
-        this.#point.type,
+        this.#point.type
       ) !== this.#offerListModel.getOffersCost(point.offers, point.type)
-    )
+    ) {
       updateType = UpdateType.SMALL;
-    // Изменения влияют только на одну строку в списке
-    else updateType = UpdateType.PATCH;
+    } else {
+      // Изменения влияют только на одну строку в списке
+      updateType = UpdateType.PATCH;
+    }
     this.#handleDataChange(ActionType.UPDATE, updateType, point);
-    this.#toView();
   };
 
   #handleBtnDeleteClick = (point) => {

@@ -1,32 +1,10 @@
 parserOptions:
   ecmaVersion: latest
-  sourceType: 'module'
+  sourceType: "module"
 
 env:
   es2022: true
   browser: true
 
 extends:
-  - 'htmlacademy/vanilla'
-  - 'prettier'
-
-plugins:
-  - import
-
-rules:
-  sort-imports:
-    - error
-    - ignoreCase: true
-      ignoreDeclarationSort: true
-
-  import/order:
-    - error
-    - groups:
-        - index
-        - sibling
-        - parent
-        - internal
-        - external
-        - builtin
-        - object
-        - type
+  - "htmlacademy/vanilla"

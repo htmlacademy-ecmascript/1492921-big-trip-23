@@ -1,6 +1,6 @@
 import {
   BLANK_POINT,
-  CaptionBtnDelete,
+  ButtonTypes,
   Folders,
   FormMode,
   HtmlClasses,
@@ -25,9 +25,7 @@ const eventTypeListTemplate = (items) => `
   <div class="event__type-list">
     <fieldset class="event__type-group">
       <legend class="visually-hidden">Event type</legend>
-        ${Object.values(items)
-          .map((item) => eventTypeItemTemplate(item))
-          .join('')}
+      ${Object.values(items).map((item) => eventTypeItemTemplate(item)).join('')}
     </fieldset>
   </div>
 `;
@@ -37,8 +35,7 @@ const offerTemplate = (item, checked) => {
   return `
   <div class="event__offer-selector">
     <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}-1" type="checkbox"
-      data-id="${id}" name="event-offer-${id}" ${checked ? 'checked' : ''}
-    >
+      data-id="${id}" name="event-offer-${id}" ${checked ? 'checked' : ''}>
     <label class="event__offer-label" for="event-offer-${id}-1">
       <span class="event__offer-title">${title}</span>
       &plus;&euro;&nbsp;
@@ -49,25 +46,14 @@ const offerTemplate = (item, checked) => {
 };
 
 const offersTemplate = (items, itemsChecked) => `
-  ${
-    items
-      ? `
+  ${items && items.length > 0 ? `
   <section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${Object.values(items)
-        .map((item) =>
-          offerTemplate(
-            item,
-            itemsChecked.find((element) => element === item.id) !== undefined,
-          ),
-        )
-        .join('')}
+      ${Object.values(items).map((item) => offerTemplate(item, itemsChecked.find((element) => element === item.id) !== undefined)).join('')}
     </div>
-  </section>
-`
-      : ''
-  }`;
+  </section>` : ''}
+  `;
 
 const descriptionTemplate = (destinationInfo) => {
   if (!destinationInfo) {
@@ -83,10 +69,7 @@ const descriptionTemplate = (destinationInfo) => {
     picturesHtml = `
       <div class="event__photos-container">
         <div class="event__photos-tape">
-          ${pictures.map(
-            (picture) =>
-              `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`,
-          )}
+          ${pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`)}
         </div>
       </div>`;
   }
@@ -106,9 +89,23 @@ const editPointTemplate = (
   eventTypeList,
   destinationList,
   offerList,
-  mode,
+  mode
 ) => {
-  const { type, destination, dateFrom, dateTo, price, offers } = state;
+  const {
+    type,
+    destination,
+    dateFrom,
+    dateTo,
+    price,
+    offers,
+    isSaving,
+    isDeleting,
+  } = state;
+  const saveCaption = isSaving ? ButtonTypes.SAVING : ButtonTypes.SAVE;
+  const deleteCaption = isDeleting ? ButtonTypes.DELETING : ButtonTypes.DELETE;
+  const resetCaption =
+    mode === FormMode.INSERTING ? ButtonTypes.CANCEL : deleteCaption;
+
   return `
   <li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
@@ -116,7 +113,8 @@ const editPointTemplate = (
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="${Folders.ICON}${type}.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17"
+              src="${Folders.ICON}${type}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
           ${eventTypeListTemplate(eventTypeList)}
@@ -127,12 +125,11 @@ const editPointTemplate = (
             ${eventTypeList[type].name}
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination"
-            value="${destinationList[destination] ? destinationList[destination].name : ''}" list="destination-list-1" required
+            value="${destinationList[destination] ? destinationList[destination].nam : ''}
+            " list="destination-list-1" required
           >
           <datalist id="destination-list-1">
-            ${Object.values(destinationList)
-              .map((item) => `<option value="${item.name}"></option>`)
-              .join('')}
+            ${Object.values(destinationList).map((item) => `<option value="${item.name}"></option>`).join('')}
           </datalist>
         </div>
 
@@ -165,18 +162,16 @@ const editPointTemplate = (
             &euro;
           </label>
           <input class="event__input  event__input--price" id="event-price-1" type="text"
-            name="event-price" value="${price}" title="Требуется целое положительное число" pattern="^[1-9][0-9]+$" required>
+            name="event-price" value="${price}" title="Требуется целое положительное число" pattern="[0-9]+$" required>
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit"}>Save</button>
-        <button class="event__reset-btn" type="reset">${CaptionBtnDelete[mode]}</button>
-        ${
-          mode === FormMode.INSERTING
-            ? ''
-            : `<button class="event__rollup-btn" type="button">
-             <span class="visually-hidden">Open event</span>
-           </button>`
-        }
+        <button class="event__save-btn  btn  btn--blue" type="submit"}>${saveCaption}</button>
+        <button class="event__reset-btn" type="reset">${resetCaption}</button>
+        ${mode === FormMode.INSERTING ? '' : `
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>
+        `}
       </header>
 
       <section class="event__details">
@@ -225,7 +220,7 @@ export default class PointEditView extends AbstractStatefulView {
       this.#eventTypeList,
       this.#destinationList,
       this.#offerList,
-      this.#mode,
+      this.#mode
     );
   }
 
@@ -258,7 +253,7 @@ export default class PointEditView extends AbstractStatefulView {
     this.element
       .querySelectorAll(`.${HtmlClasses.EVENT_OFFER}`)
       .forEach((element) =>
-        element.addEventListener('change', this.#offerChangeHandler),
+        element.addEventListener('change', this.#offerChangeHandler)
       );
   }
 
@@ -314,7 +309,7 @@ export default class PointEditView extends AbstractStatefulView {
     evt.preventDefault();
     this.updateElement({
       destination: Object.keys(this.#destinationList).find(
-        (key) => this.#destinationList[key].name === evt.target.value,
+        (key) => this.#destinationList[key].name === evt.target.value
       ),
     });
   };
@@ -345,17 +340,23 @@ export default class PointEditView extends AbstractStatefulView {
     } else {
       this._setState({
         offers: this._state.offers.filter(
-          (item) => evt.target.dataset.id !== item,
+          (item) => evt.target.dataset.id !== item
         ),
       });
     }
   };
 
   static parsePointToState(point) {
-    return { ...point };
+    return {
+      ...point,
+      isSaving: false,
+      isDeleting: false,
+    };
   }
 
   static parseStateToPoint(state) {
+    delete state.isSaving;
+    delete state.isDeleting;
     return state;
   }
 }

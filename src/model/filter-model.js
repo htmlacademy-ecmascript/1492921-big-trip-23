@@ -18,7 +18,6 @@ const FilteringFunction = {
 
 const getFilteredPoints = (points, filterValue = DEFAULT_FILTER.id) =>
   FilteringFunction[filterValue](points);
-
 export default class FilterModel extends Observable {
   #activeFilter = DEFAULT_FILTER.id;
 
@@ -26,9 +25,11 @@ export default class FilterModel extends Observable {
     return this.#activeFilter;
   }
 
-  setFilter(updateType, filterValue) {
+  setFilter(updateType, filterValue, isNotify = true) {
     this.#activeFilter = filterValue;
-    this._notify(updateType, filterValue);
+    if (isNotify) {
+      this._notify(updateType, filterValue);
+    }
   }
 }
 

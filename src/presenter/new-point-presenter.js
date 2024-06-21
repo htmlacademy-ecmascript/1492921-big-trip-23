@@ -1,7 +1,6 @@
 import { remove, render, RenderPosition } from '@framework/render.js';
 import PointEditView from '@view/point-edit-view.js';
 import { isEscapeKey } from '@utils/keyboard.js';
-import { nanoid } from 'nanoid';
 import { ActionType, FormMode, UpdateType } from '@src/const.js';
 
 export default class NewPointPresenter {
@@ -64,12 +63,12 @@ export default class NewPointPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
 
+  setSaving = (isSaving = true) => this.#pointEdit.updateElement({ isSaving });
+  setAborting = () => this.#pointEdit.shake(this.setSaving(false));
+
   #handleFormSubmit = (point) => {
-    this.#handleDataChange(ActionType.INSERT, UpdateType.MAJOR, {
-      id: nanoid(),
-      ...point,
-    });
-    this.destroy();
+    this.#handleDataChange(ActionType.INSERT, UpdateType.MAJOR, point);
+    // this.destroy();
   };
 
   #handleBtnDeleteClick = () => {

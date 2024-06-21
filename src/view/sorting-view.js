@@ -14,9 +14,7 @@ const sortItemTemplate = (item, currentSorting) => {
 
 const sortingTemplate = (items, currentSorting) => `
   <form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-    ${Object.values(items)
-      .map((item) => sortItemTemplate(item, currentSorting))
-      .join('')}
+    ${Object.values(items).map((item) => sortItemTemplate(item, currentSorting)).join('')}
   </form>
 `;
 export default class SortingView extends AbstractView {

@@ -1,4 +1,4 @@
-import { converArrayToObject } from '@utils/common.js';
+import { convertArrayToObject } from '@utils/common.js';
 
 export default class EventTypeListModel {
   #eventTypes = [
@@ -16,7 +16,7 @@ export default class EventTypeListModel {
   #items = {};
 
   constructor() {
-    this.#items = converArrayToObject(this.#eventTypes);
+    this.#items = convertArrayToObject(this.#eventTypes);
   }
 
   get items() {

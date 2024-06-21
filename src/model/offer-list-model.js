@@ -1,10 +1,23 @@
-import { mockOffers } from '../mock/mock-data.js';
-
 export default class OfferListModel {
-  #offers = mockOffers;
+  #tripApiService = null;
+  #offers = [];
   #items = {};
 
-  constructor() {
+  constructor(tripApiService) {
+    this.#tripApiService = tripApiService;
+  }
+
+  get items() {
+    return this.#items;
+  }
+
+  async init() {
+    try {
+      this.#offers = await this.#tripApiService.getOffers();
+    } catch (err) {
+      throw new Error(err.message);
+    }
+
     this.#offers.forEach((element) => {
       const offers = {};
       element.offers.forEach((offer) => {
@@ -12,10 +25,6 @@ export default class OfferListModel {
       });
       this.#items[element.type] = offers;
     });
-  }
-
-  get items() {
-    return this.#items;
   }
 
   getOffersForEventType = (eventType) => {
