@@ -107,7 +107,7 @@ export default class PointListModel extends Observable {
     ) {
       destinationsDistinct.push(lastDestionation);
     }
- 
+
     return {
       destinations: destinationsDistinct,
       dateFrom: pointsSortied[0].dateFrom,
