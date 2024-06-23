@@ -4,7 +4,6 @@ import { isDatesEqual } from '@utils/datetime.js';
 import PointView from '@view/point-view.js';
 import PointEditView from '@view/point-edit-view.js';
 import { ActionType, FormMode, SortingItems, UpdateType } from '@src/const.js';
-
 export default class PointPresenter {
   #container = null;
   #pointView = null;
@@ -166,19 +165,16 @@ export default class PointPresenter {
   #handleFormSubmit = (point) => {
     let updateType;
     if (
-      // Поля влияют на сортировку
       !isDatesEqual(this.#point.dateFrom, point.dateFrom) ||
       !isDatesEqual(this.#point.dateTo, point.dateTo)
     ) {
       updateType = UpdateType.MINOR;
     } else if (
-      // Поля влияют на сортировку
       this.#point.price !== point.price &&
       this.#currentSorting === SortingItems.PRICE.id
     ) {
       updateType = UpdateType.MINOR;
     } else if (
-      // Изменения повлият на сводную иформацию о маршруте
       this.#point.destination !== point.destination ||
       this.#point.price !== point.price ||
       this.#offerListModel.getOffersCost(
@@ -188,7 +184,6 @@ export default class PointPresenter {
     ) {
       updateType = UpdateType.SMALL;
     } else {
-      // Изменения влияют только на одну строку в списке
       updateType = UpdateType.PATCH;
     }
     this.#handleDataChange(ActionType.UPDATE, updateType, point);

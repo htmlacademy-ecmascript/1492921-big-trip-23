@@ -75,7 +75,6 @@ export default class PointListPresenter {
 
   init() {
     this.showMessage(MessageLoading.LOADING);
-    // this.#refreshPoints();
   }
 
   insertPoint() {
@@ -94,7 +93,6 @@ export default class PointListPresenter {
       onDestroy: this.#handleNewPointDestroy,
     });
     this.#newPointPresenter.init();
-    //this.#pointPresenters.set(point.id, this.#newPointPresenter);
   }
 
   showMessage(message) {
@@ -179,7 +177,6 @@ export default class PointListPresenter {
   };
 
   #handleUpdatePoints = async (actionType, updateType, point) => {
-    //this.#pointListModel.updateItems(actionType, updateType, point);
     this.#uiBlocker.block();
     switch (actionType) {
       case ActionType.INSERT:
@@ -208,7 +205,6 @@ export default class PointListPresenter {
   };
 
   #handleInsertPoints = (actionType, updateType, point) => {
-    //this.#filterModel.setFilter(updateType, DEFAULT_FILTER.id, IsNotify.NO);
     this.#handleUpdatePoints(actionType, updateType, point);
   };
 
