@@ -48,7 +48,6 @@ export default class MainPresenter {
     this.#btnNewEvent.addEventListener('click', this.#btnNewEventClickHandler);
   }
 
-  // Инициализация презентера
   async init() {
     const tripApiService = new TripApiService(END_POINT, AUTHORIZATION);
     this.#eventTypeListModel = new EventTypeListModel();
@@ -76,7 +75,6 @@ export default class MainPresenter {
     }
   }
 
-  // Отображение информации о поезке
   #refreshTripInfo() {
     remove(this.#tripInfoView);
     if (this.#pointListModel.points.length > 0) {
@@ -89,7 +87,6 @@ export default class MainPresenter {
     }
   }
 
-  // Рендеринг фильтров
   #renderFiltres() {
     this.#filterPresenter = new FilterPresenter({
       container: this.#filtersContainer,
@@ -99,7 +96,6 @@ export default class MainPresenter {
     this.#filterPresenter.init();
   }
 
-  // Рендеринг области для вывода списка точек маршрута
   #renderPointList() {
     this.#pointListPresenter = new PointListPresenter({
       container: this.#tripEventsContainer,
